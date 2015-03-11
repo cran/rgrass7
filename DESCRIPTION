@@ -1,0 +1,29 @@
+Package: rgrass7
+Version: 0.1-0
+Date: 2015-03-11
+Title: Interface Between GRASS 7 Geographical Information System and R
+Authors@R: c(
+	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
+	person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de"),
+	person("Markus", "Neteler", role = "ctb"))
+Description: Interpreted interface between GRASS 7 geographical 
+    information system and R, based on starting R from within the GRASS 
+    environment, or running free-standing R in a temporary GRASS location;
+    the package provides facilities for using all GRASS commands from the 
+    R command line. This package may not be used for GRASS 6, for which
+    spgrass6 should be used.
+Depends: R (>= 2.12), sp (>= 0.9), XML
+Suggests: rgdal (>= 0.8-8)
+SystemRequirements: GRASS (>= 7)
+License: GPL (>= 2)
+URL: http://grass.osgeo.org/
+Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
+        xml1.R
+Packaged: 2015-03-10 20:15:06 UTC; rsb
+Author: Roger Bivand [cre, aut],
+  Rainer Krug [ctb],
+  Markus Neteler [ctb]
+Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
+NeedsCompilation: no
+Repository: CRAN
+Date/Publication: 2015-03-11 11:04:53
