@@ -33,7 +33,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
                 if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
                 if (length(vname) > 1) plugin <- FALSE
                 if (plugin) {
-                    resa <- .read_rast_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
+                    resa <- .read_rast_plugin(vname, mapset=mapset, ignore.stderr=ignore.stderr)
                 } else {
                     resa <- .read_rast_non_plugin(vname=vname, NODATA=NODATA,
                                                   driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
@@ -206,7 +206,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 				}
                                 if (length(catlabs) > length(unique(catlabs))) {
                                     catlabs <- paste(catlabs, catnos, sep="_")
-                                    warning("non-unique factor labels")
+                                    warning("non-unique category labels; category number appended")
                                 }
 				resa@data[[i]] <- factor(resa@data[[i]], 
 					levels=catnos, labels=catlabs)

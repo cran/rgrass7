@@ -297,7 +297,7 @@ doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyE
                     "> is not finite", sep=""))
                 if (!is.integer(parameters[[i]])) {
                     opi <- parameters[[i]]
-                    if (as.integer(opi) == opi) {
+                    if (all(as.integer(opi) == opi)) {
                         parameters[[i]] <- as.integer(opi)
                     } else {
                         stop(paste("Parameter <", names(parameters)[i],
