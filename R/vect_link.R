@@ -17,7 +17,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         {
             stopifnot(is.logical(plugin)|| is.null(plugin))
             stopifnot(is.logical(ignore.stderr))
-            if (missing(layer)) layer <- 1L
+            if (missing(layer)) layer <- "1"
             layer <- as.character(layer)
 # 120908 emails Markus Neteler, Markus Metz, default TRUE before G7
             stopifnot(is.logical(with_c))
@@ -30,14 +30,13 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                 ogrD <- rgdal::ogrDrivers()$name
                 plugin <- "GRASS" %in% ogrD
             }
-            sss <- strsplit(packageDescription("rgdal")$Version, "-")[[1]]
             if (plugin) {
                 res <- .read_vect_plugin(vname=vname, layer=layer, type=type,
-                    sss=sss, ignore.stderr=ignore.stderr,
+                    ignore.stderr=ignore.stderr,
                     pointDropZ=pointDropZ, mapset = mapset)
             } else {
                 res <- .read_vect_non_plugin(vname=vname, layer=layer,
-                    type=type, remove.duplicates=remove.duplicates, sss=sss,
+                    type=type, remove.duplicates=remove.duplicates,
                     ignore.stderr=ignore.stderr, pointDropZ=pointDropZ,
                     driver=driver, with_prj=with_prj, with_c=with_c)
             }
@@ -55,7 +54,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
 
 ## internal function for reading vectors via plugin
 
-.read_vect_plugin <- function(vname, layer, type, sss, ignore.stderr, pointDropZ, mapset) {
+.read_vect_plugin <- function(vname, layer, type, ignore.stderr, pointDropZ, mapset) {
     ogrD <- rgdal::ogrDrivers()$name
 	if (!("GRASS" %in% ogrD)) stop("no GRASS plugin driver")
         gg <- gmeta()
@@ -70,27 +69,23 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         }
         dsn <- paste(gg$GISDBASE, gg$LOCATION_NAME, mapset,
             "vector", vname[1], "head", sep="/")
-        if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
-	    res <- rgdal::readOGR(dsn, layer=as.character(layer),
-                verbose=!ignore.stderr, pointDropZ=pointDropZ)
-        } else {
-	    res <- rgdal::readOGR(dsn, layer=as.character(layer),
-                verbose=!ignore.stderr)
-        }
+	res <- rgdal::readOGR(dsn, layer=as.character(layer),
+            verbose=!ignore.stderr, pointDropZ=pointDropZ)
     return(res)
 }
 
 ## internal function for reading vectors without plugin
-.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, sss, ignore.stderr, pointDropZ, driver, with_prj,with_c)
+.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, ignore.stderr, pointDropZ, driver, with_prj,with_c)
 {
     ogrD <- rgdal::ogrDrivers()
-    ogrDw <- ogrD$name[ogrD$write]
+    ogrDw <- gsub(" ", "_", ogrD$name[ogrD$write])
 # guess GRASS v.out.ogr capability from rgdal
     ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
                            ignore.stderr=ignore.stderr)
-    ogrDGRASSs <- sapply(strsplit(ogrDGRASS, ": "), "[", 2)
-    candDrivers <- sort(intersect(ogrDGRASSs, ogrDw))
+    ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+    candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
     if (!is.null(driver)) {
+        driver <- gsub(" ", "_", driver)
         stopifnot(is.character(driver))
         stopifnot(length(driver) == 1)
         stopifnot(driver %in% candDrivers)
@@ -109,7 +104,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
 
     is_dDriver <- TRUE
-    if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
+    driver <- gsub(" ", "_", driver)
+    if (driver %in% fDrivers) is_dDriver <- FALSE
     vinfo <- vInfo(vname)
     types <- names(vinfo)[which(vinfo > 0)]
     if (is.null(type)) {
@@ -129,7 +125,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                       gtmpfl1)
 
     fieldNameFix <- FALSE
-    if (driver == "ESRI Shapefile") {
+    if (driver == "ESRI_Shapefile") {
         shname <- substring(vname, 1, ifelse(nchar(vname) > 8, 8, 
                                              nchar(vname)))
         cnamesLen <- nchar(as.character(vColumns(vname)$name))
@@ -141,6 +137,15 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     } else {
         shname <- vname
         fieldNameFix <- FALSE
+    }
+    if (fieldNameFix) {
+        dc <- execGRASS("db.connect", flags="p", intern=TRUE,
+            ignore.stderr=ignore.stderr)
+        dbDriver <- strsplit(dc[grep("driver:", dc)], " ")[[1]][2]
+        if (dbDriver != "sqlite") {
+            fieldNameFix <- FALSE
+            warning("readVECT: db driver not sqlite - no long field/column name fix available")
+        }
     }
     
     flags <- "overwrite"
@@ -195,13 +200,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                 name=tmpvname,  ignore.stderr=ignore.stderr)
 
 
-            if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
-                res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
-                    verbose=!ignore.stderr, pointDropZ=pointDropZ)
-            } else {
-                res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, 
-                    verbose=!ignore.stderr)
-            }
+            res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
+                verbose=!ignore.stderr, pointDropZ=pointDropZ)
             if (!is.null(df)) {
                 row.names(df) <- row.names(res)
                 slot(res, "data") <- merge(slot(res, "data"), df, by="cat")
@@ -229,13 +229,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                  ignore.stderr=ignore.stderr)
             }
 
-            if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
-                res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
-                    verbose=!ignore.stderr, pointDropZ=pointDropZ)
-            } else {
-                res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, 
-                    verbose=!ignore.stderr)
-            }
+            res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
+                verbose=!ignore.stderr, pointDropZ=pointDropZ)
         },
         finally = {
             if (.Platform$OS.type != "windows") {
@@ -371,13 +366,14 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
         stop("rgdal not available")
     }
     ogrD <- rgdal::ogrDrivers()
-    ogrDw <- ogrD$name[ogrD$write]
+    ogrDw <- gsub(" ", "_", ogrD$name[ogrD$write])
 # guess GRASS v.out.ogr capability from rgdal
     ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
                            ignore.stderr=ignore.stderr)
-    ogrDGRASSs <- sapply(strsplit(ogrDGRASS, ": "), "[", 2)
-    candDrivers <- sort(intersect(ogrDGRASSs, ogrDw))
+    ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+    candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
     if (!is.null(driver)) {
+        driver <- gsub(" ", "_", driver)
         stopifnot(is.character(driver))
         stopifnot(length(driver) == 1)
         stopifnot(driver %in% candDrivers)
@@ -399,7 +395,6 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
             dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
             is_dDriver <- TRUE
             if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
-            sss <- strsplit(packageDescription("rgdal")$Version, "-")[[1]]
             type <- NULL
             if (class(SDF) == "SpatialPointsDataFrame") type <- "point"
             if (class(SDF) == "SpatialLinesDataFrame") type <- "line"
@@ -416,7 +411,7 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
 
            fieldNameFix <- FALSE
            shname <- vname
-           if (driver == "ESRI Shapefile") {
+           if (driver == "ESRI_Shapefile") {
                shname <- substring(vname, 1, ifelse(nchar(vname) > 8, 8, 
                                              nchar(vname)))
                 cnamesLen <- nchar(as.character(names(SDF)))
@@ -442,7 +437,7 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
               tryCatch(
                 {
                       rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, 
-                          driver=driver, overwrite_layer=TRUE)
+                          driver=gsub("_", " ", driver), overwrite_layer=TRUE)
 
                     
                     execGRASS("v.in.ogr", flags=v.in.ogr_flags,
@@ -466,8 +461,9 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
                       rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, driver=driver,
                           layer_options="LAUNDER=NO", overwrite_layer=TRUE)
                     } else {
-                      rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, driver=driver,
-                                    overwrite_layer=TRUE)
+                      rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER,
+                          driver=gsub("_", " ", driver),
+                          overwrite_layer=TRUE)
                     }
                     
                     
@@ -502,7 +498,7 @@ vInfo <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
 
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="t", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)
@@ -528,13 +524,16 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
         if (is.null(ignore.stderr))
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="c", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)       
-	con <- textConnection(vinfo0)
-        res <- read.table(con, header=FALSE, sep="|")
-	close(con)
+        vinfo1 <- strsplit(vinfo0, "\\|")
+        vinfo2 <- vinfo1[sapply(vinfo1, length) == 2]
+        if (length(vinfo1) != length(vinfo2))
+            warning("vColumns: v.info -c output not in two columns:\n",
+                paste(vinfo1[sapply(vinfo1, length) != 2]))
+        res <- as.data.frame(do.call("rbind", vinfo2))
 	names(res) <- c("storageType", "name")
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
@@ -551,7 +550,7 @@ vDataCount <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
         column <- "column" %in% parseGRASS("v.db.select")$pnames
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
         parms <- list(map=vname, layer=as.character(layer), columns="cat")
         if (column) tull <- execGRASS("v.db.select", flags="c",
