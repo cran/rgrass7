@@ -1,10 +1,4 @@
 parseGRASS <- function(cmd, legacyExec=NULL) {
-    bin_out_win <- c("d.colors.exe", "d.save.exe", "d.what.rast.exe",
-      "d.what.vect.exe", "d.zoom.exe", "g.parser.exe", "gis.m.bat",
-      "i.spectral.bat", "mkftcap.bat", "r.mapcalc.exe", "r.tileset.bat",
-      "r3.mapcalc.exe", "v.in.gpsbabel.bat", "v.proj.exe")
-    if ((get("SYS", envir=.GRASS_CACHE) == "WinNat") && cmd %in% bin_out_win)
-            stop(paste("No interface description:", cmd))
     cmdCACHE <- get("cmdCACHE", envir=.GRASS_CACHE)
     res <- cmdCACHE[[cmd]]
     if (is.null(legacyExec))
@@ -16,39 +10,26 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
     }
     if (is.null(res)) {
         ext <- get("addEXE", envir=.GRASS_CACHE)
-        if (get("SYS", envir=.GRASS_CACHE) == "WinNat") {
-            if (any(nchar(WN_bat <- get("WN_bat", envir=.GRASS_CACHE)) == 0)) {
-                WN_bat <- sub(".bat", "", 
+        WN_bat <- get("WN_bat", envir=.GRASS_CACHE)
+        if (get("SYS", envir=.GRASS_CACHE) == "WinNat" && nchar(WN_bat) == 0) {
+            WN_bat <- sub(".bat", "", 
                 list.files(paste(Sys.getenv("GISBASE"), "bin", sep="/"),
-                    pattern=".bat$"))
+                pattern=".bat$"))
+            if (nchar(Sys.getenv("GRASS_ADDON_BASE")) > 0) {
+                t0 <- try(sub(".bat", "", 
+                   list.files(paste(Sys.getenv("GRASS_ADDON_BASE"),
+                       "bin", sep="/"), pattern=".bat$")), silent=TRUE)
+                if (class(t0) != "try-error" && is.character(t0) &&
+                   nchar(t0) > 0)
+                   WN_bat <- c(WN_bat, t0)
                 assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
             }
-        } else if (get("SYS", envir=.GRASS_CACHE) == "msys") {
-            if (any(nchar(WN_bat <- get("WN_bat", envir=.GRASS_CACHE)) == 0)) {
-                WN_bat <- list.files(paste(Sys.getenv("GISBASE"), "scripts",
-                    sep="/"))
-                assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
-            }
-        }
+        } 
         prep <- ""
-        if ((get("SYS", envir=.GRASS_CACHE) == "WinNat") && cmd %in% WN_bat)
-            ext <- ".bat"
-        else if ((get("SYS", envir=.GRASS_CACHE) == "msys") &&
-            cmd %in% WN_bat) {
-                ext <- ""
-                prep <- paste("sh.exe ", Sys.getenv("GISBASE"),
-                    "/scripts/", sep="")
-        }
         if ((get("SYS", envir=.GRASS_CACHE) == "WinNat") &&
-            length(grep("7", get("GV", envir=.GRASS_CACHE)) > 0)) {
-# Luke Winslow 130209
-            pyScripts <- get("pyScripts", envir=.GRASS_CACHE)
-            if (cmd %in% names(pyScripts)) {
-                ext <- ".py"
-                prep <- paste("\"", Sys.getenv("GRASS_PYTHON"), "\" ",
-                    "\"", Sys.getenv("GISBASE"), "/scripts/\"", sep="")
-            }            
-        }
+            cmd %in% get("WN_bat", envir=.GRASS_CACHE))
+            ext <- ".bat"
+
         cmd0 <- paste(paste(prep, cmd, ext, sep=""), "--interface-description")
         if (legacyExec) {
             tr <- try(system(cmd0, intern=TRUE))

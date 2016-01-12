@@ -17,21 +17,14 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   assign("cmdCACHE", list(), envir=.GRASS_CACHE)
   assign("override_encoding", "", envir=.GRASS_CACHE)
   SYS <- ""
-  if (.Platform$OS.type == "windows") {
-    if (Sys.getenv("OSTYPE") == "msys") SYS <- "msys"
-    else SYS <- "WinNat"
-  } else if (.Platform$OS.type == "unix") SYS <- "unix"
+  if (.Platform$OS.type == "windows") SYS <- "WinNat"
+  else if (.Platform$OS.type == "unix") SYS <- "unix"
+  else SYS <- "unknown"
   assign("SYS", SYS, envir=.GRASS_CACHE)
   res <- ""
-  if (SYS == "msys" || SYS == "WinNat") res =".exe"
+  if (SYS == "WinNat") res =".exe"
   assign("addEXE", res, envir=.GRASS_CACHE)
   assign("WN_bat", "", envir=.GRASS_CACHE)
-  if (SYS == "WinNat" && nchar(gisrc) > 0) {
-    pyScripts <- basename(list.files(paste(Sys.getenv("WINGISBASE"),
-      "scripts", sep="/"), pattern="py$"))
-    names(pyScripts) <- sub("\\.py", "", pyScripts)
-    assign("pyScripts", pyScripts, envir=.GRASS_CACHE)
-  }
 
   assign("ignore.stderr", FALSE, envir=.GRASS_CACHE)
   assign("useGDAL", TRUE, envir=.GRASS_CACHE)
@@ -50,8 +43,7 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   loc <- Sys.getenv("LOCATION_NAME")
   if (nchar(gisrc) == 0) gv <- "(GRASS not running)"
   else {
-    gv <- .grassVersion()#system(paste("g.version", get("addEXE", envir=.GRASS_CACHE),
-          #             sep=""),  intern=TRUE)
+    gv <- .grassVersion()
     comp <- .compatibleGRASSVersion(gv)
     if ( !comp ){
         stop( attr(comp, "message") )

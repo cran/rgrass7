@@ -1,6 +1,6 @@
 Package: rgrass7
-Version: 0.1-3
-Date: 2015-10-07
+Version: 0.1-4
+Date: 2016-01-11
 Title: Interface Between GRASS 7 Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
@@ -18,15 +18,16 @@ Imports: stats, utils, methods
 Suggests: rgdal (>= 1.0-6), RSQLite
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
-URL: http://grass.osgeo.org/
+URL: http://grass.osgeo.org/,
+        https://r-forge.r-project.org/projects/spgrass/
 Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
         xml1.R
 NeedsCompilation: no
-Packaged: 2015-10-12 11:14:58 UTC; rsb
+Packaged: 2016-01-12 19:17:16 UTC; rsb
 Author: Roger Bivand [cre, aut],
   Rainer Krug [ctb],
   Markus Neteler [ctb],
   Sebastian Jeworutzki [ctb]
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2015-10-12 14:00:09
+Date/Publication: 2016-01-12 22:18:22

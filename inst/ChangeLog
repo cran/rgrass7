@@ -1,3 +1,44 @@
+2016-01-12 14:09  rsbivand
+
+	* R/xml1.R: addon bat files fix
+
+2016-01-11 14:07  rsbivand
+
+	* ChangeLog, R/vect_link.R: vector layer tidy
+
+2016-01-11 13:51  rsbivand
+
+	* DESCRIPTION, R/AAA.R, R/rgrass.R, R/xml1.R: attempt to make
+	  addons visible under Windows
+
+2015-10-11 18:38  rsbivand
+
+	* R/vect_link.R: Windows rgdal drivers issue
+
+2015-10-11 18:32  rsbivand
+
+	* R/vect_link.R: Windows rgdal drivers issue
+
+2015-10-11 13:48  rsbivand
+
+	* R/vect_link.R: Windows rgdal drivers issue
+
+2015-10-08 21:27  rsbivand
+
+	* DESCRIPTION, R/vect_link.R: Windows rgdal drivers issue
+
+2015-09-25 09:02  rsbivand
+
+	* NAMESPACE: importFrom(methods, slot, 'slot<-', as)
+
+2015-08-23 18:39  rsbivand
+
+	* inst, inst/ChangeLog: tidy
+
+2015-08-23 18:38  rsbivand
+
+	* ChangeLog: tidy
+
 2015-08-23 18:36  rsbivand
 
 	* DESCRIPTION, NAMESPACE, R/bin_link.R, R/vect_link.R,

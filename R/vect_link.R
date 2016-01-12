@@ -117,12 +117,16 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
 
     pid <- as.integer(round(runif(1, 1, 1000)))
 
-    gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
-                                 intern=TRUE, ignore.stderr=ignore.stderr))
+    gtmpfl1 <- execGRASS("g.tempfile", pid=pid,
+                                 intern=TRUE, ignore.stderr=ignore.stderr)
+# FIXME
+    gtmpfl1_dir <- dirname(gtmpfl1)
+    unlink(gtmpfl1)
+    if (is_dDriver) gtmpfl1 <- gtmpfl1_dir
     rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
                           (Sys.getenv("OSTYPE") == "cygwin"), 
-                      system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
-                      gtmpfl1)
+                      system(paste("cygpath -w", gtmpfl1, sep=" "),
+                          intern=TRUE), gtmpfl1)
 
     fieldNameFix <- FALSE
     if (driver == "ESRI_Shapefile") {
@@ -151,15 +155,10 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     flags <- "overwrite"
     if (with_prj) flags <- c(flags, "e")
     if (with_c) flags <- c(flags, "c")
-    if (is_dDriver){
-        GDSN <- gtmpfl1
-        RDSN <- rtmpfl1
-        LAYER <- shname
-    } else {
-        GDSN <- paste(gtmpfl1, shname, sep=.Platform$file.sep)
-        RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
-        LAYER <- shname
-    }
+    GDSN <- gtmpfl1
+    RDSN <- rtmpfl1
+    LAYER <- shname
+
 # FIXME use RSQLite for df if 
     if (fieldNameFix) {
       tryCatch(
@@ -208,10 +207,14 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
             }
         },
         finally = {
-            if (.Platform$OS.type != "windows") {
+#            if (.Platform$OS.type != "windows") {
+            if (is_dDriver) {
                 unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-                             sep=.Platform$file.sep))
+                    sep=.Platform$file.sep))
+            } else {
+                unlink(rtmpfl1)
             }
+#           }
         }
       )
     } else {
@@ -233,10 +236,14 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                 verbose=!ignore.stderr, pointDropZ=pointDropZ)
         },
         finally = {
-            if (.Platform$OS.type != "windows") {
+#            if (.Platform$OS.type != "windows") {
+            if (is_dDriver) {
                 unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-                             sep=.Platform$file.sep))
+                    sep=.Platform$file.sep))
+            } else {
+                unlink(rtmpfl1)
             }
+#            }
         }
       )
     }
@@ -402,12 +409,15 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
             if (is.null(type)) stop("Unknown data class")
 
             pid <- as.integer(round(runif(1, 1, 1000)))
-            gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
-                                         intern=TRUE, ignore.stderr=ignore.stderr))
+            gtmpfl1 <- execGRASS("g.tempfile", pid=pid,
+                 intern=TRUE, ignore.stderr=ignore.stderr)
+            gtmpfl1_dir <- dirname(gtmpfl1)
+            unlink(gtmpfl1)
+            if (is_dDriver) gtmpfl1 <- gtmpfl1_dir
             rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
-                                  (Sys.getenv("OSTYPE") == "cygwin"), 
-                              system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
-                              gtmpfl1)
+                (Sys.getenv("OSTYPE") == "cygwin"), 
+                system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
+                    gtmpfl1)
 
            fieldNameFix <- FALSE
            shname <- vname
@@ -424,15 +434,10 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
                 fieldNameFix <- FALSE
             }
 
-            if (is_dDriver){
-                GDSN <- gtmpfl1
-                RDSN <- rtmpfl1
-                LAYER <- shname
-            } else {
-                GDSN <- paste(gtmpfl1, shname, sep=.Platform$file.sep)
-                RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
-                LAYER <- shname
-            }
+            GDSN <- gtmpfl1
+            RDSN <- rtmpfl1
+            LAYER <- shname
+
             if (fieldNameFix) {
               tryCatch(
                 {
@@ -448,9 +453,12 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
                               ignore.stderr=ignore.stderr)
                 },
                 finally = {
-                    if (.Platform$OS.type != "windows") {
-                        unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-                                     sep=.Platform$file.sep))
+#                    if (.Platform$OS.type != "windows") {
+                    if (is_dDriver) {
+                        unlink(paste(rtmpfl1, list.files(rtmpfl1,
+                            pattern=shname), sep=.Platform$file.sep))
+                    } else {
+                         unlink(rtmpfl1)
                     }
                 }
               )

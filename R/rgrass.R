@@ -133,7 +133,7 @@ getLocationProj <- function(ignore.stderr = FALSE) {
 .addexe <- function() {
     res <- ""
     SYS <- get("SYS", envir=.GRASS_CACHE)
-    if (SYS == "msys" || SYS == "WinNat") res =".exe"
+    if (SYS == "WinNat") res =".exe"
     res
 }
 
