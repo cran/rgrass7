@@ -12,8 +12,8 @@
 The locking functions are used internally, but are exposed for experienced R/GRASS scripters needing to use the GRASS module \dQuote{g.mapset} through \code{initGRASS} in an existing GRASS location. In particular, \dQuote{g.mapset} may leave a \code{.gislock} file in the current MAPSET, so it may be important to call \code{unlink_.gislock} to clean up before quitting the R session.
 }
 \usage{
-initGRASS(gisBase, home, SG, gisDbase, location, mapset, override = FALSE,
- use_g.dirseps.exe = TRUE, pid)
+initGRASS(gisBase, home, SG, gisDbase, addon_base, location, mapset,
+  override = FALSE, use_g.dirseps.exe = TRUE, pid)
 get.GIS_LOCK()
 set.GIS_LOCK(pid)
 unset.GIS_LOCK()
@@ -25,6 +25,7 @@ unlink_.gislock()
   \item{home}{The directory in which to create the .gisrc file; defaults to \code{$HOME} on Unix systems and to \code{USERPROFILE} on Windows systems; can usually be set to \code{tempdir()}}
   \item{SG}{An optional \code{SpatialGrid} object to define the \code{DEFAULT_WIND} of the temporary location}
   \item{gisDbase}{if missing, \code{tempdir()} will be used; GRASS GISDBASE directory for the working session}
+  \item{addon_base}{if missing, assumed to be \dQuote{$HOME/.grass7/addons} on Unix-like platforms, on MS Windows \dQuote{\%APPDATA\%\\GRASS7\\addons}, and checked for existence}
   \item{location}{if missing, \code{basename(tempfile())} will be used; GRASS location directory for the working session}
   \item{mapset}{if missing, \code{basename(tempfile())} will be used; GRASS mapset directory for the working session}
   \item{override}{default FALSE, set to TRUE if accidental trashing of GRASS .gisrc files and locations is not a problem}
