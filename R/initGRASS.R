@@ -21,7 +21,7 @@ unlink_.gislock <- function() {
 }
 
 initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
-    mapset, override=FALSE, use_g.dirseps.exe=TRUE, pid) {
+    mapset, override=FALSE, use_g.dirseps.exe=TRUE, pid, remove_GISRC=FALSE) {
     if (nchar(Sys.getenv("GISRC")) > 0 && !override)
       stop("A GRASS location is already in use; to override, set override=TRUE")
 
@@ -34,6 +34,12 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     if (missing(pid)) pid <- round(runif(1, 1, 1000))
     pid <- as.integer(pid)
     stopifnot(!is.na(pid))
+    stopifnot(is.logical(override))
+    stopifnot(length(override) == 1)
+    stopifnot(is.logical(use_g.dirseps.exe))
+    stopifnot(length(use_g.dirseps.exe) == 1)
+    stopifnot(is.logical(remove_GISRC))
+    stopifnot(length(remove_GISRC) == 1)
 
     if (!file.exists(gisBase)) stop(paste(gisBase, "not found"))
 
@@ -160,6 +166,7 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     set.GIS_LOCK(pid)
     assign("INIT_USED", TRUE, envir=.GRASS_CACHE)
     assign("GIS_LOCK", pid, envir=.GRASS_CACHE)
+    if (remove_GISRC) assign("remove_GISRC", remove_GISRC, envir=.GRASS_CACHE)
     system(paste(paste("g.gisenv", get("addEXE", envir=.GRASS_CACHE), sep=""),
         shQuote(paste("set=GISDBASE=", gisDbase))))
     if (missing(location)) location <- basename(tempfile())
@@ -234,4 +241,13 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     tfile <- paste(loc_path, mapset, "WIND", sep="/")
     if (!file.exists(tfile)) file.copy(pfile, tfile, overwrite=TRUE)
     gmeta()
+}
+
+remove_GISRC <- function() {
+    if (get("INIT_USED", envir=.GRASS_CACHE) && 
+        get("remove_GISRC", envir=.GRASS_CACHE)) {
+        gisrc <- Sys.getenv("GISRC")
+        if (file.exists(gisrc)) unlink(gisrc)
+        Sys.unsetenv("GISRC")
+    }
 }

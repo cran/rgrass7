@@ -8,6 +8,7 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   assign(".GRASS_old.GRASS_MESSAGE_FORMAT", Sys.getenv("GRASS_MESSAGE_FORMAT"),
     envir=.GRASS_CACHE)
   assign("INIT_USED", FALSE, envir=.GRASS_CACHE)
+  assign("remove_GISRC", FALSE, envir=.GRASS_CACHE)
   
   Sys.setenv("GRASS_MESSAGE_FORMAT"="text")
 
@@ -64,6 +65,11 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
 
 .onUnload <- function(lib, pkg) {
     if (get("INIT_USED", envir=.GRASS_CACHE)) {
+        if (get("remove_GISRC", envir=.GRASS_CACHE)) {
+            gisrc <- Sys.getenv("GISRC")
+            if (file.exists(gisrc)) unlink(gisrc)
+            Sys.unsetenv("GISRC")
+        }
         unlink_.gislock()
         unset.GIS_LOCK()
     }

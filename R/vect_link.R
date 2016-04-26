@@ -80,7 +80,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     ogrD <- rgdal::ogrDrivers()
     ogrDw <- gsub(" ", "_", ogrD$name[ogrD$write])
 # guess GRASS v.out.ogr capability from rgdal
-    ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
+    ogrDGRASS <- execGRASS("v.in.ogr", flags=ifelse(ignore.stderr, c("f",
+                           "quiet"), "f"), intern=TRUE,
                            ignore.stderr=ignore.stderr)
     ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
     candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
@@ -143,7 +144,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         fieldNameFix <- FALSE
     }
     if (fieldNameFix) {
-        dc <- execGRASS("db.connect", flags="p", intern=TRUE,
+        dc <- execGRASS("db.connect", flags=ifelse(ignore.stderr, c("p",
+                           "quiet"), "p"), intern=TRUE,
             ignore.stderr=ignore.stderr)
         dbDriver <- strsplit(dc[grep("driver:", dc)], " ")[[1]][2]
         if (dbDriver != "sqlite") {
@@ -153,6 +155,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     }
     
     flags <- "overwrite"
+    if (ignore.stderr) flags <- c(flags, "quiet")
     if (with_prj) flags <- c(flags, "e")
     if (with_c) flags <- c(flags, "c")
     GDSN <- gtmpfl1
@@ -167,7 +170,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                 stop("RSQLite not available")
             }
             t1 <- execGRASS("v.info", map=vname, layer=as.character(layer),
-                flags=c("e"), intern=TRUE)
+                flags=ifelse(ignore.stderr, c("e",
+                           "quiet"), "e"), intern=TRUE)
             t1a <- strsplit(t1[1:4], "=")
             names(t1a) <- sapply(t1a, "[", 1L)
             t2 <- unlist(lapply(t1a, "[", -1L))
