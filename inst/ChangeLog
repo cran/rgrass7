@@ -1,3 +1,16 @@
+2016-05-09 14:38  rsbivand
+
+	* DESCRIPTION: tidy
+
+2016-04-25 08:07  rsbivand
+
+	* DESCRIPTION, NAMESPACE, R/AAA.R, R/initGRASS.R, R/vect_link.R,
+	  man/initGRASS.Rd: tidy
+
+2016-04-11 12:13  rsbivand
+
+	* ChangeLog, inst/ChangeLog: tidy
+
 2016-04-11 12:12  rsbivand
 
 	* DESCRIPTION, R/xml1.R: WinNat *.bat issue
