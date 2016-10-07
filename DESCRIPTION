@@ -1,6 +1,6 @@
 Package: rgrass7
-Version: 0.1-8
-Date: 2016-05-09
+Version: 0.1-9
+Date: 2016-10-07
 Title: Interface Between GRASS 7 Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
@@ -23,11 +23,11 @@ URL: http://grass.osgeo.org/,
 Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
         xml1.R
 NeedsCompilation: no
-Packaged: 2016-05-09 14:40:32 UTC; rsb
+Packaged: 2016-10-07 15:55:07 UTC; rsb
 Author: Roger Bivand [cre, aut],
   Rainer Krug [ctb],
   Markus Neteler [ctb],
   Sebastian Jeworutzki [ctb]
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2016-05-09 17:53:05
+Date/Publication: 2016-10-07 18:30:22

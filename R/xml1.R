@@ -19,8 +19,8 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
                 t0 <- try(sub(".bat", "", 
                    list.files(paste(Sys.getenv("GRASS_ADDON_BASE"),
                        "bin", sep="/"), pattern=".bat$")), silent=TRUE)
-                if (class(t0) != "try-error" && is.character(t0) &&
-                   nchar(t0) > 0)
+                if (length(t0) > 0 && class(t0) != "try-error" &&
+                   is.character(t0) && nchar(t0) > 0)
                    WN_bat <- c(WN_bat, t0)
             }
             assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
