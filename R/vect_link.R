@@ -83,7 +83,15 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     ogrDGRASS <- execGRASS("v.in.ogr", flags=ifelse(ignore.stderr, c("f",
                            "quiet"), "f"), intern=TRUE,
                            ignore.stderr=ignore.stderr)
-    ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+    gv <- unname(read.dcf(textConnection(gsub("=", ":", 
+      execGRASS("g.version", flags="g", intern=TRUE))))[1,1])
+    if (gv < "7.3") {
+      ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+    } else {
+      strs <- sapply(strsplit(ogrDGRASS, ": "), "[", 1)
+      ogrDGRASSs <- gsub(" ", "_", gsub(" $", "",
+        substring(strs, 2, nchar(strs)-5)))
+    }
     candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
     if (!is.null(driver)) {
         driver <- gsub(" ", "_", driver)
