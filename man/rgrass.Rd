@@ -52,7 +52,7 @@ if (nchar(Sys.getenv("GISRC")) > 0 &&
   pts <- spsample(elevation, 200, "random")
   smple <- SpatialPointsDataFrame(pts, data=over(pts, elevation))
   summary(smple)
-  writeVECT(smple, "sp_dem", v.in.ogr_flags="overwrite", ignore.stderr=TRUE)
+  writeVECT(smple, "sp_dem", v.in.ogr_flags=c("overwrite", "o"), ignore.stderr=TRUE)
   bugsDF <- readVECT("schools", ignore.stderr=TRUE, mapset="PERMANENT")
   summary(bugsDF)
   vInfo("streams", ignore.stderr=TRUE)

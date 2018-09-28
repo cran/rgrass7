@@ -1,3 +1,32 @@
+2018-09-24 08:40  rsbivand
+
+	* ChangeLog, inst/ChangeLog: trial updates for OSGEO4W
+
+2018-09-24 08:39  rsbivand
+
+	* DESCRIPTION, R/initGRASS.R, man/rgrass.Rd: trial updates for
+	  OSGEO4W
+
+2017-10-20 19:02  rsbivand
+
+	* DESCRIPTION, R/vect_link.R: fix SQLite writeVECT issue
+
+2017-10-12 10:37  rsbivand
+
+	* DESCRIPTION, R/vect_link.R: OGR drivers Markus Metz fix
+
+2017-10-11 11:21  rsbivand
+
+	* DESCRIPTION, R/vect_link.R: readVECT driver 7.3 bug resolved
+
+2016-11-18 14:18  rsbivand
+
+	* DESCRIPTION, R/xml1.R: tidy
+
+2016-05-09 14:39  rsbivand
+
+	* ChangeLog, inst/ChangeLog: tidy
+
 2016-05-09 14:38  rsbivand
 
 	* DESCRIPTION: tidy

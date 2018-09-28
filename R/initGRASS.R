@@ -54,8 +54,14 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
                 "/GRASS7/addons", sep="")
         addon_res <- file.exists(addon_base, paste(addon_base, "/bin", sep=""))
         if (any(addon_res)) Sys.setenv("GRASS_ADDON_BASE"=addon_base)
-        Sys.setenv(GRASS_PROJSHARE=paste(Sys.getenv("GISBASE"),
-            "\\proj", sep=""))
+        OSGEO4W_ROOT <- Sys.getenv("OSGEO4W_ROOT")
+        if (nchar(OSGEO4W_ROOT) > 0) {
+            Sys.setenv(GRASS_PROJSHARE=paste(OSGEO4W_ROOT,
+                "\\share\\proj", sep=""))
+        } else {
+            Sys.setenv(GRASS_PROJSHARE=paste(Sys.getenv("GISBASE"),
+                "\\share\\proj", sep=""))
+        }
         Wpath <- Sys.getenv("PATH")
         if (length(grep(basename(Sys.getenv("GISBASE")), Wpath)) < 1) {
             Sys.setenv(PATH=paste(Sys.getenv("GISBASE"), "\\lib;", 
@@ -97,7 +103,13 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
         Sys.setenv(GISRC=paste(Sys.getenv("HOME"), "\\.grassrc7", sep=""))
         if (file.exists(Sys.getenv("GISRC")) && !override)
             stop("A GISRC file already exists; to override, set override=TRUE")
-        Sys.setenv(GISRC="junk")
+        fn_gisrc <- "junk"
+        if (isTRUE(file.access(".", 2) == 0)) {
+            Sys.setenv(GISRC=fn_gisrc)
+        } else {
+            warning("working directory not writable, using tempfile for GISRC")
+            Sys.setenv(GISRC=paste0(tempfile(), "_", fn_gisrc))
+        }
         cat("GISDBASE:", getwd(), "\n", file=Sys.getenv("GISRC"))
         cat("LOCATION_NAME: <UNKNOWN>", "\n", file=Sys.getenv("GISRC"),
             append=TRUE)

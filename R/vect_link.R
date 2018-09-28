@@ -83,15 +83,18 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     ogrDGRASS <- execGRASS("v.in.ogr", flags=ifelse(ignore.stderr, c("f",
                            "quiet"), "f"), intern=TRUE,
                            ignore.stderr=ignore.stderr)
-    gv <- unname(read.dcf(textConnection(gsub("=", ":", 
-      execGRASS("g.version", flags="g", intern=TRUE))))[1,1])
-    if (gv < "7.3") {
-      ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
-    } else {
-      strs <- sapply(strsplit(ogrDGRASS, ": "), "[", 1)
-      ogrDGRASSs <- gsub(" ", "_", gsub(" $", "",
-        substring(strs, 2, nchar(strs)-5)))
-    }
+#    gv <- unname(read.dcf(textConnection(gsub("=", ":", 
+#      execGRASS("g.version", flags="g", intern=TRUE))))[1,1])
+#    if (gv < "7.3") {
+#      ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+#    } else {
+#      strs <- sapply(strsplit(ogrDGRASS, ": "), "[", 1)
+#      ogrDGRASSs <- gsub(" ", "_", gsub(" $", "",
+#        substring(strs, 2, nchar(strs)-5)))
+#    }
+# Markus Metz 2017-10-11
+    ogrDGRASSs <- gsub(" ", "_", trimws(sapply(strsplit(ogrDGRASS,
+      " [(]"), "[", 1)))
     candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
     if (!is.null(driver)) {
         driver <- gsub(" ", "_", driver)
@@ -389,7 +392,10 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
 # guess GRASS v.out.ogr capability from rgdal
     ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
                            ignore.stderr=ignore.stderr)
-    ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+#    ogrDGRASSs <- gsub(" ", "_", sapply(strsplit(ogrDGRASS, ": "), "[", 2))
+# Markus Metz 2017-10-11
+    ogrDGRASSs <- gsub(" ", "_", trimws(sapply(strsplit(ogrDGRASS,
+      " [(]"), "[", 1)))
     candDrivers <- gsub(" ", "_", sort(intersect(ogrDGRASSs, ogrDw)))
     if (!is.null(driver)) {
         driver <- gsub(" ", "_", driver)
