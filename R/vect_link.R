@@ -5,6 +5,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         remove.duplicates=TRUE, ignore.stderr = NULL,
         with_prj=TRUE,  with_c=FALSE, mapset=NULL, pointDropZ=FALSE,
         driver=NULL) {
+        if (is.null(.get_R_interface())) stop ("either sp or sf must be chosen")
+        R_in_sp <- isTRUE(.get_R_interface() == "sp")
 
         if (is.null(plugin))
             plugin <- get.pluginOption()
@@ -23,22 +25,21 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
             stopifnot(is.logical(with_c))
             if (!is.null(driver) && driver == "GRASS") plugin <- TRUE
             
-            if (!requireNamespace("rgdal", quietly = TRUE)) {
-                stop("rgdal not available")
-            }
             if (is.null(plugin)) {
-                ogrD <- rgdal::ogrDrivers()$name
+                if (R_in_sp) ogrD <- rgdal::ogrDrivers()$name
+                else ogrD <- as.character(sf::st_drivers("vector")$name)
                 plugin <- "GRASS" %in% ogrD
             }
             if (plugin) {
                 res <- .read_vect_plugin(vname=vname, layer=layer, type=type,
                     ignore.stderr=ignore.stderr,
-                    pointDropZ=pointDropZ, mapset = mapset)
+                    pointDropZ=pointDropZ, mapset = mapset, R_in_sp=R_in_sp)
             } else {
                 res <- .read_vect_non_plugin(vname=vname, layer=layer,
                     type=type, remove.duplicates=remove.duplicates,
                     ignore.stderr=ignore.stderr, pointDropZ=pointDropZ,
-                    driver=driver, with_prj=with_prj, with_c=with_c)
+                    driver=driver, with_prj=with_prj, with_c=with_c, 
+                    R_in_sp=R_in_sp)
             }
         },
         finally = {    
@@ -54,8 +55,9 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
 
 ## internal function for reading vectors via plugin
 
-.read_vect_plugin <- function(vname, layer, type, ignore.stderr, pointDropZ, mapset) {
-    ogrD <- rgdal::ogrDrivers()$name
+.read_vect_plugin <- function(vname, layer, type, ignore.stderr, pointDropZ, mapset, R_in_sp) {
+        if (R_in_sp) ogrD <- rgdal::ogrDrivers()$name
+        else ogrD <- as.character(sf::st_drivers("vector")$name)
 	if (!("GRASS" %in% ogrD)) stop("no GRASS plugin driver")
         gg <- gmeta()
         if (is.null(mapset)) {
@@ -69,15 +71,17 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         }
         dsn <- paste(gg$GISDBASE, gg$LOCATION_NAME, mapset,
             "vector", vname[1], "head", sep="/")
-	res <- rgdal::readOGR(dsn, layer=as.character(layer),
+	if (R_in_sp) res <- rgdal::readOGR(dsn, layer=as.character(layer),
             verbose=!ignore.stderr, pointDropZ=pointDropZ)
+        else res <- sf::st_read(dsn, layer=as.character(layer), quiet=ignore.stderr)
     return(res)
 }
 
 ## internal function for reading vectors without plugin
-.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, ignore.stderr, pointDropZ, driver, with_prj,with_c)
+.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, ignore.stderr, pointDropZ, driver, with_prj,with_c, R_in_sp)
 {
-    ogrD <- rgdal::ogrDrivers()
+    if (R_in_sp) ogrD <- rgdal::ogrDrivers()
+    else ogrD <- sf::st_drivers("vector")
     ogrDw <- gsub(" ", "_", ogrD$name[ogrD$write])
 # guess GRASS v.out.ogr capability from rgdal
     ogrDGRASS <- execGRASS("v.in.ogr", flags=ifelse(ignore.stderr, c("f",
@@ -102,7 +106,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         stopifnot(length(driver) == 1)
         stopifnot(driver %in% candDrivers)
     } else {
-        preferDriver <- c("SQLite", "ESRI_Shapefile")
+        preferDriver <- c("GPKG", "SQLite", "ESRI_Shapefile")
         for (d in preferDriver) {
             if (d %in% candDrivers) {
                 driver <- d
@@ -112,7 +116,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     }
     stopifnot(!is.null(driver))
 
-    fDrivers <- c("GML", "SQLite")
+    fDrivers <- c("GPKG", "GML", "SQLite")
     dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
 
     is_dDriver <- TRUE
@@ -171,6 +175,10 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
     if (with_c) flags <- c(flags, "c")
     GDSN <- gtmpfl1
     RDSN <- rtmpfl1
+    if (driver == "GPKG") {
+         GDSN <- paste0(GDSN, ".gpkg")
+         RDSN <- paste0(RDSN, ".gpkg")
+    }
     LAYER <- shname
 
 # FIXME use RSQLite for df if 
@@ -214,8 +222,10 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                 name=tmpvname,  ignore.stderr=ignore.stderr)
 
 
-            res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
+            if (R_in_sp) res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
                 verbose=!ignore.stderr, pointDropZ=pointDropZ)
+            else res <- sf::st_read(dsn=RDSN, layer=as.character(LAYER),
+                     quiet=ignore.stderr)
             if (!is.null(df)) {
                 row.names(df) <- row.names(res)
                 slot(res, "data") <- merge(slot(res, "data"), df, by="cat")
@@ -247,8 +257,10 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                  ignore.stderr=ignore.stderr)
             }
 
-            res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
+            if (R_in_sp) res <- rgdal::readOGR(dsn=RDSN, layer=LAYER,
                 verbose=!ignore.stderr, pointDropZ=pointDropZ)
+            else res <- sf::st_read(dsn=RDSN, layer=as.character(LAYER),
+                     quiet=ignore.stderr)
         },
         finally = {
 #            if (.Platform$OS.type != "windows") {
@@ -263,7 +275,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
       )
     }
     
-    if (remove.duplicates && type != "point") {
+    if (R_in_sp && remove.duplicates && type != "point") {
         dups <- duplicated(slot(res, "data"))
         if (any(dups)) {
             if (length(grep("line", type)) > 0) type <- "line"
@@ -279,7 +291,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
             } else if (type == "line") {
                 pls <- slot(res, "lines")
             }
-            p4s <- proj4string(res)
+            p4s <- sp::proj4string(res)
             IDs <- as.character(res$cat)
             IDs[is.na(IDs)] <- "na"
             tab <- table(factor(IDs))
@@ -303,17 +315,17 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
                     srl <- c(srl, plijp)
                 }
                 if (type == "area") {
-                    npls[[i]] <- Polygons(srl, ID=IDss[i])
+                    npls[[i]] <- sp::Polygons(srl, ID=IDss[i])
                 } else if (type == "line") {
-                    npls[[i]] <- Lines(srl, ID=IDss[i])
+                    npls[[i]] <- sp::Lines(srl, ID=IDss[i])
                 }
             }
             if (type == "area") {
-                SP <- SpatialPolygons(npls, proj4string=CRS(p4s))
-                res <- SpatialPolygonsDataFrame(SP, ndata)
+                SP <- sp::SpatialPolygons(npls, proj4string=sp::CRS(p4s))
+                res <- sp::SpatialPolygonsDataFrame(SP, ndata)
             } else if (type == "line") {
-                SP <- SpatialLines(npls, proj4string=CRS(p4s))
-                res <- SpatialLinesDataFrame(SP, ndata)
+                SP <- sp::SpatialLines(npls, proj4string=sp::CRS(p4s))
+                res <- sp::SpatialLinesDataFrame(SP, ndata)
             }
         }
 
@@ -374,10 +386,12 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
 }
 
 writeVECT <- function(SDF, vname, #factor2char = TRUE, 
-     v.in.ogr_flags=NULL, ignore.stderr = NULL,
-     driver=NULL, min_area=0.0001, snap=-1) {
+    v.in.ogr_flags=NULL, ignore.stderr = NULL,
+    driver=NULL, min_area=0.0001, snap=-1) {
 
-        if (is.null(ignore.stderr))
+    R_in_sp <- isTRUE(.get_R_interface() == "sp")
+
+    if (is.null(ignore.stderr))
             ignore.stderr <- get.ignore.stderrOption()
         stopifnot(is.logical(ignore.stderr))
     if (get.suppressEchoCmdInFuncOption()) {
@@ -387,7 +401,8 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
     if (!requireNamespace("rgdal", quietly = TRUE)) {
         stop("rgdal not available")
     }
-    ogrD <- rgdal::ogrDrivers()
+    if (R_in_sp) ogrD <- rgdal::ogrDrivers()
+    else ogrD <- sf::st_drivers("vector")
     ogrDw <- gsub(" ", "_", ogrD$name[ogrD$write])
 # guess GRASS v.out.ogr capability from rgdal
     ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
@@ -403,7 +418,7 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
         stopifnot(length(driver) == 1)
         stopifnot(driver %in% candDrivers)
     } else {
-        preferDriver <- c("SQLite", "ESRI_Shapefile")
+        preferDriver <- c("GPKG", "SQLite", "ESRI_Shapefile")
         for (d in preferDriver) {
             if (d %in% candDrivers) {
                 driver <- d
@@ -416,14 +431,23 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
     tryCatch(
         {
 #FIXME
-            fDrivers <- c("GML", "SQLite")
+            fDrivers <- c("GPKG", "GML", "SQLite")
             dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
             is_dDriver <- TRUE
             if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
             type <- NULL
-            if (class(SDF) == "SpatialPointsDataFrame") type <- "point"
-            if (class(SDF) == "SpatialLinesDataFrame") type <- "line"
-            if (class(SDF) == "SpatialPolygonsDataFrame") type <- "boundary"
+            if (R_in_sp) {
+              if (class(SDF) == "SpatialPointsDataFrame") type <- "point"
+              if (class(SDF) == "SpatialLinesDataFrame") type <- "line"
+              if (class(SDF) == "SpatialPolygonsDataFrame") type <- "boundary"
+            } else {
+              type0 <- sub("sfc_", "", class(sf::st_geometry(SDF))[1])
+              if (type0 == "POINT") type <- "point"
+              if (type0 == "LINESTRING" || type0 == "MULTILINESTRING")
+                type <- "line"
+              if (type0 == "POLYGON" || type0 == "MULTIPOLYGON")
+                type <- "boundary"
+            }
             if (is.null(type)) stop("Unknown data class")
 
             pid <- as.integer(round(runif(1, 1, 1000)))
@@ -454,13 +478,19 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
 
             GDSN <- gtmpfl1
             RDSN <- rtmpfl1
+            if (driver == "GPKG") {
+                GDSN <- paste0(GDSN, ".gpkg")
+                RDSN <- paste0(RDSN, ".gpkg")
+            }
             LAYER <- shname
 
             if (fieldNameFix) {
               tryCatch(
                 {
-                      rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, 
+                      if (R_in_sp) rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, 
                           driver=gsub("_", " ", driver), overwrite_layer=TRUE)
+                      else sf::st_write(SDF, dsn=RDSN, layer=LAYER,
+                          driver=gsub("_", " ", driver))
 
                     
                     execGRASS("v.in.ogr", flags=v.in.ogr_flags,
@@ -484,12 +514,19 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
               tryCatch(
                 {
                     if (driver == "SQLite") {
-                      rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, driver=driver,
+                      if (R_in_sp) rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER,
+                          driver=driver,
                           layer_options="LAUNDER=NO", overwrite_layer=TRUE)
+                      else sf::st_write(SDF, dsn=RDSN, layer=LAYER,
+                          driver=gsub("_", " ", driver),
+                          layer_options="LAUNDER=NO", quiet=ignore.stderr)
                     } else {
-                      rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER,
+                      if (R_in_sp) rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER,
                           driver=gsub("_", " ", driver),
                           overwrite_layer=TRUE)
+                      else sf::st_write(SDF, dsn=RDSN, layer=LAYER,
+                          driver=gsub("_", " ", driver), quiet=ignore.stderr,
+                          layer_options="OVERWRITE=YES")
                     }
                     
                     

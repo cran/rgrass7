@@ -2,41 +2,46 @@
 # Copyright (c) 2015 Roger S. Bivand
 #
 
-readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(), 
-	NODATA=NULL, plugin=get.pluginOption(), mapset=NULL, useGDAL=get.useGDALOption(), close_OK=TRUE,
-        drivername="GTiff", driverFileExt=NULL, return_SGDF=TRUE) {
-	if (!is.null(cat))
+readRAST <- function(vname, cat=NULL, ignore.stderr=get.ignore.stderrOption(), 
+	NODATA=NULL, plugin=get.pluginOption(), mapset=NULL, 
+        useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
+        driverFileExt=NULL, return_SGDF=TRUE) {
+
+    R_in_sp <- isTRUE(.get_R_interface() == "sp")
+
+    if (!is.null(cat))
 		if(length(vname) != length(cat)) 
 			stop("vname and cat not same length")
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- set.echoCmdOption(FALSE)
     }
-                if (close_OK) {
+    if (close_OK) {
                     openedConns <- as.integer(row.names(showConnections()))
-                }
+    }
+    stopifnot(is.logical(ignore.stderr))
+    stopifnot(is.logical(useGDAL))
 
-        tryCatch(
+    if (useGDAL && is.null(R_in_sp)) stop("GDAL not available")
+    if (R_in_sp) gdalD <- rgdal::gdalDrivers()$name
+    else gdalD <- as.character(sf::st_drivers("raster")$name)
+
+
+    tryCatch(
             {
                 stopifnot(is.logical(plugin)|| is.null(plugin))
                 if (!is.null(plugin) && plugin && length(vname) > 1) plugin <- FALSE
-                stopifnot(is.logical(ignore.stderr))
-                stopifnot(is.logical(useGDAL))
-                if (useGDAL) {
-                    if (requireNamespace("rgdal", quietly = TRUE)) {
-                        gdalD <- rgdal::gdalDrivers()$name
-                    } else {
-                        stop("rgdal not available")
-                    }
-                }
                 if (!useGDAL && is.null(plugin)) plugin <- FALSE
                 
                 if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
                 if (length(vname) > 1) plugin <- FALSE
                 if (plugin) {
-                    resa <- .read_rast_plugin(vname, mapset=mapset, ignore.stderr=ignore.stderr)
+                    resa <- .read_rast_plugin(vname, mapset=mapset, 
+                        ignore.stderr=ignore.stderr, R_in_sp=R_in_sp)
                 } else {
                     resa <- .read_rast_non_plugin(vname=vname, NODATA=NODATA,
-                                                  driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
+                        driverFileExt=driverFileExt, 
+                        ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, 
+                        cat=cat, R_in_sp=R_in_sp)
                 }
             },
             finally = {
@@ -49,16 +54,19 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
                     tull <- set.echoCmdOption(inEchoCmd)
                 }
             }
-        )
+    )
 
     resa
 }
 
 
-.read_rast_non_plugin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, cat){
+.read_rast_non_plugin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, cat, R_in_sp){
     {
 	pid <- as.integer(round(runif(1, 1, 1000)))
-	p4 <- CRS(getLocationProj())
+
+	if (!R_in_sp) stop("no stars import yet")
+        
+	p4 <- sp::CRS(getLocationProj())
 
         reslist <- vector(mode="list", length=length(vname))
         names(reslist) <- vname
@@ -170,7 +178,10 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 
         co <- unname(c((gdal_info[4] + (gdal_info[6]/2)),
             (gdal_info[5] + (gdal_info[7]/2))))
-	grid <- GridTopology(co, unname(c(gdal_info[6], gdal_info[7])),
+        if (is.null(R_in_sp) && !requireNamespace("sp", quietly=TRUE)) 
+          stop("sp classes required but sp not available")
+	if (!R_in_sp) stop("no stars import of binary flat files yet")
+        grid <- sp::GridTopology(co, unname(c(gdal_info[6], gdal_info[7])),
             unname(c(gdal_info[2], gdal_info[1])))
 
         if (!return_SGDF) {
@@ -184,7 +195,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 
         df <- as.data.frame(reslist)
 
-	resa <- SpatialGridDataFrame(grid=grid, data=df, proj4string=p4)
+	resa <- sp::SpatialGridDataFrame(grid=grid, data=df, proj4string=p4)
 
 	if (!is.null(cat)) {
 		for (i in seq(along=cat)) {
@@ -327,12 +338,13 @@ readBinGridData <- function(fname, what, n, size, endian, nodata) {
 #	res
 #}
 
-.read_rast_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
+.read_rast_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL, R_in_sp) {
 
         if (is.null(ignore.stderr))
             ignore.stderr <- get.ignore.stderrOption()
         stopifnot(is.logical(ignore.stderr))
         if (length(vname) > 1) stop("single raster required for plugin")
+        if (!R_in_sp) stop("no stars plugin support yet")
 
         gg <- gmeta()
         if (is.null(mapset)) {
@@ -384,6 +396,9 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
             inEchoCmd <- set.echoCmdOption(FALSE)
         }
 
+        R_in_sp <- isTRUE(.get_R_interface() == "sp")
+
+        if (!R_in_sp) stop("no stars support yet")
         tryCatch(
             {
                 stopifnot(is.logical(ignore.stderr))
@@ -435,10 +450,10 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
 }
 
 writeBinGrid <- function(x, fname, attr = 1, na.value = NULL) { 
-	if (!gridded(x))
+	if (!sp::gridded(x))
 		stop("can only write SpatialGridDataFrame objects to binary grid")
 	x = as(x, "SpatialGridDataFrame")
-	gp = gridparameters(x)
+	gp = sp::gridparameters(x)
 	if (length(gp$cells.dim) != 2)
 		stop("binary grid only supports 2D grids")
 	z = x@data[[attr]]

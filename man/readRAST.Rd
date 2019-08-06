@@ -48,58 +48,97 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL,
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no}}
 
 \examples{
+use_sp()
+run <- FALSE
 if (nchar(Sys.getenv("GISRC")) > 0 &&
-  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") run <- TRUE
   GV <- Sys.getenv("GRASS_VERBOSE")
   Sys.setenv("GRASS_VERBOSE"=0)
-  require(rgdal)
+#  require(rgdal)
   ois <- get.ignore.stderrOption()
   set.ignore.stderrOption(TRUE)
   get.useGDALOption()
+if (run) {
   nc_basic <- readRAST(c("geology", "elevation"), cat=c(TRUE, FALSE),
     useGDAL=FALSE)
   nc_basic <- readRAST(c("geology", "elevation"), cat=c(TRUE, FALSE),
     useGDAL=TRUE)
   print(table(nc_basic$geology))
+}
+if (run) {
   execGRASS("r.stats", flags=c("c", "l", "quiet"), input="geology")
+}
+if (run) {
   boxplot(nc_basic$elevation ~ nc_basic$geology)
+}
+if (run) {
   nc_basic$sqdem <- sqrt(nc_basic$elevation)
-  if ("GRASS" \%in\% gdalDrivers()$name) {
+}
+if (run) {
+  if ("GRASS" \%in\% rgdal::gdalDrivers()$name) {
     execGRASS("g.region", raster="elevation")
     dem1 <- readRAST("elevation", plugin=TRUE, mapset="PERMANENT")
     print(summary(dem1))
     execGRASS("g.region", raster="elevation")
   }
-  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", flags="quiet")
+}
+if (run) {
+  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", flags=c("quiet", "overwrite"))
   execGRASS("r.info", map="sqdemSP")
+}
+if (run) {
   execGRASS("g.remove", flags="f", name="sqdemSP", type="raster")
-  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", useGDAL=TRUE, flags="quiet")
+}
+if (run) {
+  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", useGDAL=TRUE, flags=c("quiet", "overwrite"))
   execGRASS("r.info", map="sqdemSP")
+}
+if (run) {
   print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=TRUE, return_SGDF=FALSE)))
+}
+if (run) {
   print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=TRUE, return_SGDF=TRUE)))
+}
+if (run) {
   print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=FALSE, return_SGDF=TRUE)))
+}
+if (run) {
   print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=FALSE, return_SGDF=FALSE)))
+}
+if (run) {
   str(sqdemSP)
   mat <- do.call("cbind", sqdemSP$dataList)
   str(mat)
-  print(system.time(SGDF <- SpatialGridDataFrame(grid=sqdemSP$grid,
+}
+if (run) {
+  print(system.time(SGDF <- sp::SpatialGridDataFrame(grid=sqdemSP$grid,
     proj4string=sqdemSP$proj4string, data=as.data.frame(sqdemSP$dataList))))
+}
+if (run) {
   summary(SGDF)
+}
+if (run) {
   execGRASS("g.remove", flags="f", name="sqdemSP", type="raster")
   execGRASS("r.mapcalc", expression="basins0 = basins - 1")
   execGRASS("r.stats", flags="c", input="basins0")
+}
+if (run) {
   basins0 <- readRAST("basins0")
   print(table(basins0$basins0))
+}
+if (run) {
   basins0 <- readRAST("basins0", plugin=FALSE)
   print(table(basins0$basins0))
+}
+if (run) {
   execGRASS("g.remove", flags="f", name="basins0", type="raster")
+}
   Sys.setenv("GRASS_VERBOSE"=GV)
   set.ignore.stderrOption(ois)
-}
 }
 \keyword{spatial}
 

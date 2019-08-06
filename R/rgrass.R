@@ -75,7 +75,10 @@ gmeta2grd <- function(ignore.stderr = FALSE) {
 	cellcentre.offset <- c(G$w+(G$ewres/2), G$s+(G$nsres/2))
 	cellsize <- c(G$ewres, G$nsres)
 	cells.dim <- c(G$cols, G$rows)
-	grd <- GridTopology(cellcentre.offset=cellcentre.offset, 
+        R_in_sp <- isTRUE(.get_R_interface() == "sp")
+        if (!R_in_sp) stop("no stars grid yet")
+
+	grd <- sp::GridTopology(cellcentre.offset=cellcentre.offset, 
 		cellsize=cellsize, cells.dim=cells.dim)
 	grd
 }
@@ -160,4 +163,20 @@ getLocationProj <- function(ignore.stderr = FALSE) {
         attr(compatible, "message") <- paste0("rgrass7 is compatible with the GRASS GIS version '", gv, "' R is running in!")
     }
     return(compatible)
+}
+
+.get_R_interface <- function() get("R_interface", envir=.GRASS_CACHE)
+
+use_sf <- function() {
+  if (requireNamespace("sf", quietly=TRUE) && 
+    requireNamespace("stars", quietly=TRUE))
+    assign("R_interface", "sf", envir=.GRASS_CACHE)
+  else stop("sf or stars not available")
+}
+
+use_sp <- function() {
+  if (requireNamespace("sp", quietly=TRUE) && 
+     requireNamespace("rgdal", quietly=TRUE))
+     assign("R_interface", "sp", envir=.GRASS_CACHE)
+  else stop("sp or rgdal not available")
 }

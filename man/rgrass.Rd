@@ -41,23 +41,40 @@ Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 
 
 \examples{
+use_sp()
+run <- FALSE
 if (nchar(Sys.getenv("GISRC")) > 0 &&
-  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
-  require(rgdal)
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") run <- TRUE
+if (run) {
+#  require(rgdal)
   elevation <- readRAST("elevation", ignore.stderr=TRUE, plugin=FALSE)
   summary(elevation)
+}
+if (run) {
   grd <- gmeta2grd(ignore.stderr=TRUE)
   grd
+}
+if (run) {
   set.seed(1)
-  pts <- spsample(elevation, 200, "random")
-  smple <- SpatialPointsDataFrame(pts, data=over(pts, elevation))
+  pts <- sp::spsample(elevation, 200, "random")
+  smple <- sp::SpatialPointsDataFrame(pts, data=sp::over(pts, elevation))
   summary(smple)
+}
+if (run) {
   writeVECT(smple, "sp_dem", v.in.ogr_flags=c("overwrite", "o"), ignore.stderr=TRUE)
   bugsDF <- readVECT("schools", ignore.stderr=TRUE, mapset="PERMANENT")
   summary(bugsDF)
+}
+if (run) {
   vInfo("streams", ignore.stderr=TRUE)
+}
+if (run) {
   vColumns("streams", ignore.stderr=TRUE)
+}
+if (run) {
   vDataCount("streams", ignore.stderr=TRUE)
+}
+if (run) {
   streams <- readVECT("streams", type="line",
     remove.duplicates=FALSE, ignore.stderr=TRUE, plugin=FALSE)
   summary(streams)

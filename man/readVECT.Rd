@@ -42,7 +42,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
   \item{driver}{default NULL, which will lead to the choice of the first driver found in a ordered preferred vector, currently \code{c("SQLite", "ESRI Shapefile")}; a valid OGR writable driver name to define the file format for intermediate files, one of \code{c("GML", "SQLite"), c("ESRI_Shapefile", "MapInfo_File")} is preferred as these construct the names of the intermediate files adequately}
   \item{min_area}{default 0.0001); Minimum size of area to be imported (square meters) Smaller areas and islands are ignored. Should be greater than snap^2}
   \item{snap}{default -1); Snapping threshold for boundaries (map units). '-1' for no snap}
-  \item{SDF}{A Spatial*DataFrame to be moved to GRASS 7 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects}
+  \item{SDF}{A Spatial*DataFrame to be moved to GRASS 7 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects, or an equivalent \code{"sf"} object}
   \item{v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
   \item{ID}{A valid DB column name for unique identifiers (optional)}
   \item{remove}{default TRUE, remove copied vectors created in \code{vect2neigh}}
@@ -51,7 +51,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
 
 }
 \value{
-   \code{readVECT} imports a GRASS 7 vector object into a Spatial*DataFrame object with the type determined by the type of the GRASS 7 vector object. \code{readVECT} and \code{writeVECT} attempt to preserve longer column/field names despite using the \dQuote{ESRI Shapefile} format for transfer.
+   \code{readVECT} imports a GRASS 7 vector object into an Spatial*DataFrame or equivalent \code{"sf"} object with the type determined by the type of the GRASS 7 vector object. \code{readVECT} and \code{writeVECT} attempt to preserve longer column/field names despite using the \dQuote{ESRI Shapefile} format for transfer.
 
 \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
 
@@ -63,45 +63,95 @@ Please note that the OGR drivers used may not handle missing data gracefully. Fr
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
 
 \examples{
+use_sp()
+run <- FALSE
 if (nchar(Sys.getenv("GISRC")) > 0 &&
-  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
-  GV <- Sys.getenv("GRASS_VERBOSE")
-  Sys.setenv("GRASS_VERBOSE"=0)
-  require(rgdal)
-  ois <- get.ignore.stderrOption()
-  set.ignore.stderrOption(TRUE)
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") run <- TRUE
+GV <- Sys.getenv("GRASS_VERBOSE")
+Sys.setenv("GRASS_VERBOSE"=0)
+#  require(rgdal)
+ois <- get.ignore.stderrOption()
+set.ignore.stderrOption(TRUE)
+if (run) {
   execGRASS("v.info", map="schools", layer="1")
+}
+if (run) {
   print(vInfo("schools"))
   schs <- readVECT("schools", plugin=NULL)
   print(summary(schs))
+}
+if (run) {
   schs1 <- readVECT("schools", plugin=FALSE)
   print(summary(schs1))
+}
+if (run) {
   writeVECT(schs, "newsch", v.in.ogr_flags=c("o", "overwrite"))
   execGRASS("v.info", map="newsch", layer="1")
+}
+if (run) {
   nschs <- readVECT("newsch")
   print(summary(nschs))
+}
+if (run) {
   print(all.equal(names(nschs), as.character(vColumns("newsch")[,2])))
+}
+if (run) {
   names(nschs) <- paste("ABCDEFGHIJKLMNO", names(nschs), sep="")
   writeVECT(nschs, "newsch1", v.in.ogr_flags=c("o", "overwrite"))
+}
+if (run) {
   print(all.equal(names(nschs), as.character(vColumns("newsch1")[-1,2])))
+}
+if (run) {
   nschs1 <- readVECT("newsch1")
   print(all.equal(names(nschs), names(nschs1)[-1]))
+}
+if (run) {
   print(summary(nschs1))
+}
+if (run) {
   schs <- readVECT("schools", driver="ESRI Shapefile")
   names(schs) <- paste("ABCDEFGHIJKLMNO", names(schs), sep="")
   writeVECT(schs, "newsch", v.in.ogr_flags=c("o", "overwrite"),
     driver="ESRI Shapefile")
   print(all.equal(names(schs), as.character(vColumns("newsch")[-1,2])))
+}
+if (run) {
   nschs <- readVECT("newsch", driver="ESRI Shapefile")
   all.equal(names(schs), names(nschs)[-1])
+}
+if (run) {
   print(vInfo("roadsmajor"))
+}
+if (run) {
   roads <- readVECT("roadsmajor")
   print(summary(roads))
+}
+if (run) {
   cen_neig <- vect2neigh("census")
   str(cen_neig)
-  Sys.setenv("GRASS_VERBOSE"=GV)
-  set.ignore.stderrOption(ois)
 }
+use_sf()
+if (run) {
+  print(vInfo("schools"))
+  schs <- readVECT("schools", plugin=NULL)
+  print(summary(schs))
+}
+if (run) {
+  schs1 <- readVECT("schools", plugin=FALSE)
+  print(summary(schs1))
+}
+if (run) {
+  writeVECT(schs, "newsch", v.in.ogr_flags=c("o", "overwrite"))
+  execGRASS("v.info", map="newsch", layer="1")
+}
+if (run) {
+  nschs <- readVECT("newsch")
+  print(summary(nschs))
+}
+Sys.setenv("GRASS_VERBOSE"=GV)
+set.ignore.stderrOption(ois)
+use_sp()
 }
 \keyword{spatial}
 

@@ -1,3 +1,12 @@
+2018-11-23 08:42  rsbivand
+
+	* DESCRIPTION, R/initGRASS.R, man/initGRASS.Rd: test gisBase for
+	  bin and scripts
+
+2018-09-28 07:42  rsbivand
+
+	* ChangeLog, inst/ChangeLog: tidy
+
 2018-09-24 08:40  rsbivand
 
 	* ChangeLog, inst/ChangeLog: trial updates for OSGEO4W

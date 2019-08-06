@@ -1,4 +1,5 @@
-import(sp)
+#import(sp)
+#import(sf)
 import(XML)
 importFrom(utils, packageDescription, read.table)
 importFrom(stats, runif, na.omit)
@@ -10,6 +11,7 @@ export(initGRASS, get.GIS_LOCK, set.GIS_LOCK, unset.GIS_LOCK, unlink_.gislock)
 export(remove_GISRC)
 export(readRAST, writeRAST)
 export(readVECT, writeVECT, vInfo, vColumns, vDataCount, vect2neigh)
+export(use_sp, use_sf)
 export(set.ignore.stderrOption, get.ignore.stderrOption, set.useGDALOption,
  get.useGDALOption, set.stop_on_no_flags_parasOption,
  get.stop_on_no_flags_parasOption, set.pluginOption, get.pluginOption,

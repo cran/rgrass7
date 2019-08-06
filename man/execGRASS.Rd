@@ -52,26 +52,44 @@ setXMLencoding(enc)
 \seealso{\code{\link[base]{system}}}
 
 \examples{
+run <- FALSE
 if (nchar(Sys.getenv("GISRC")) > 0 &&
-  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") run <- TRUE
   oechoCmd <- get.echoCmdOption()
   set.echoCmdOption(TRUE)
+if (run) {
   print(parseGRASS("r.slope.aspect"))
+}
+if (run) {
   doGRASS("r.slope.aspect", flags=c("overwrite"),
     elevation="elevation.dem", slope="slope", aspect="aspect")
+}
+if (run) {
   pars <- list(elevation="elevation", slope="slope", aspect="aspect")
   doGRASS("r.slope.aspect", flags=c("overwrite"), parameters=pars)
+}
+if (run) {
   print(parseGRASS("r.buffer"))
+}
+if (run) {
   doGRASS("r.buffer", flags=c("overwrite"), input="schools", output="bmap",
     distances=seq(1000,15000,1000))
+}
+if (run) {
   pars <- list(input="schools", output="bmap", distances=seq(1000,15000,1000))
   doGRASS("r.buffer", flags=c("overwrite"), parameters=pars)
+}
+if (run) {
   set.echoCmdOption(oechoCmd)
   try(res <- execGRASS("r.stats", input = "fire_blocksgg", # no such file
     flags = c("C", "n")), silent=FALSE)
+}
+if (run) {
   res <- execGRASS("r.stats", input = "fire_blocksgg", flags = c("C", "n"),
     legacyExec=TRUE)
   print(res)
+}
+if (run) {
   if (res != 0) {
     resERR <- execGRASS("r.stats", input = "fire_blocksgg", 
       flags = c("C", "n"), redirect=TRUE, legacyExec=TRUE)

@@ -37,6 +37,7 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   assign("legacyExec", .Platform$OS.type == "windows", envir=.GRASS_CACHE)
   assign("defaultFlags", NULL, envir=.GRASS_CACHE)
   assign("suppressEchoCmdInFunc", TRUE, envir=.GRASS_CACHE)
+  assign("R_interface", NULL, envir=.GRASS_CACHE)
 }
 
 .onAttach <- function(lib, pkg) {

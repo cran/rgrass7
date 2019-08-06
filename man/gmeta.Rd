@@ -23,12 +23,16 @@
 \alias{set.legacyExecOption}
 \alias{set.defaultFlagsOption}
 \alias{set.suppressEchoCmdInFuncOption}
+\alias{use_sf}
+\alias{use_sp}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Reads GRASS metadata from the current LOCATION}
 \description{
-  GRASS LOCATION metadata are read into a list in R; helper function getLocationProj returns an spproj-compliant PROJ.4 string of projection information. The helper function \code{gmeta2grd} creates a GridTopology object from the current GRASS mapset region definitions.
+  GRASS LOCATION metadata are read into a list in R; helper function getLocationProj returns an spproj-compliant PROJ.4 string of projection information. The helper function \code{gmeta2grd} creates a GridTopology object from the current GRASS mapset region definitions. The new \code{use_sf()} and \code{use_sp()} functions permit the user to use \code{"sf"} and \code{"stars"} classes for raster and vector objects in R; use will be extended over time.
 }
 \usage{
+use_sf()
+use_sp()
 gmeta(ignore.stderr = FALSE)
 getLocationProj(ignore.stderr = FALSE)
 gmeta2grd(ignore.stderr = FALSE)
@@ -67,16 +71,25 @@ set.suppressEchoCmdInFuncOption(value)
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
 
 \examples{
+use_sp()
+run <- FALSE
 if (nchar(Sys.getenv("GISRC")) > 0 &&
-  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") run <- TRUE
+if (run) {
   G <- gmeta()
   print(G)
-  CRS(getLocationProj())
+}
+if (run) {
+  sp::CRS(getLocationProj())
+}
+if (run) {
   grd <- gmeta2grd()
   print(grd)
+}
+if (run) {
   ncells <- prod(slot(grd, "cells.dim"))
   df <- data.frame(k=rep(1, ncells))
-  mask_SG <- SpatialGridDataFrame(grd, data=df)
+  mask_SG <- sp::SpatialGridDataFrame(grd, data=df)
   print(summary(mask_SG))
 }
 }

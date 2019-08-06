@@ -42,6 +42,15 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     stopifnot(length(remove_GISRC) == 1)
 
     if (!file.exists(gisBase)) stop(paste(gisBase, "not found"))
+    if (!file.info(gisBase)$isdir[1]) stop(gisBase, " is not a directory")
+    bin_is_dir <- file.info(file.path(gisBase, "bin"))$isdir[1]
+    if (is.na(bin_is_dir)) 
+      stop(gisBase, " does not contain bin, the directory with GRASS programs")
+    if (!bin_is_dir) stop(gisBase, "/bin is not a directory")
+    scripts_is_dir <- file.info(file.path(gisBase, "scripts"))$isdir[1]
+    if (is.na(scripts_is_dir)) 
+      stop(gisBase, " does not contain scripts, the directory with GRASS scripts")
+    if (!scripts_is_dir) stop(gisBase, "/scripts is not a directory")
 
     SYS <- get("SYS", envir=.GRASS_CACHE) 
     if (SYS == "WinNat") {
@@ -215,8 +224,12 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     pfile <- paste(loc_path, "PERMANENT", "DEFAULT_WIND", sep="/")
     if (!file.exists(pfile)) {
         mSG <- !missing(SG)
-        if (mSG) bb <- bbox(SG)
-        if (mSG) gt <- gridparameters(SG)
+        if (mSG) {
+          R_in_sp <- isTRUE(.get_R_interface() == "sp")
+          if (!R_in_sp) stop("no stars SG yet")
+        }
+        if (mSG) bb <- sp::bbox(SG)
+        if (mSG) gt <- sp::gridparameters(SG)
         cat("proj:       0\n", file=pfile)
         cat("zone:       0\n", file=pfile, append=TRUE)
         cat("north:      ", ifelse(mSG, bb[2, "max"], 1), "\n",
