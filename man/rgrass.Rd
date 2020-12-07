@@ -27,7 +27,7 @@ vColumns                return vector database columns information
 vDataCount              return count of vector database rows
 vect2neigh              return area neighbours with shared boundary length
 }
-Note that the examples now use the smaller subset North Carolina location: \url{http://grass.osgeo.org/sampledata/north_carolina/nc_basic_spm_grass7.tar.gz}
+Note that the examples now use the smaller subset North Carolina location: \url{https://grass.osgeo.org/sampledata/north_carolina/nc_basic_spm_grass7.tar.gz}
 }
 \author{
 Roger Bivand

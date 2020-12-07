@@ -1,6 +1,6 @@
 Package: rgrass7
-Version: 0.2-1
-Date: 2019-07-23
+Version: 0.2-3
+Date: 2020-12-03
 Title: Interface Between GRASS 7 Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
@@ -18,16 +18,18 @@ Imports: stats, utils, methods
 Suggests: rgdal (>= 1.0-6), RSQLite, sp (>= 0.9), sf (>= 0.7.6), stars
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
-URL: http://grass.osgeo.org/,
-        https://r-forge.r-project.org/projects/spgrass/
+URL: https://grass.osgeo.org/, https://github.com/rsbivand/rgrass7,
+        https://rsbivand.github.io/rgrass7/
+BugReports: https://github.com/rsbivand/rgrass7/issues/
 Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
         xml1.R
+RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-08-06 07:27:11 UTC; rsb
+Packaged: 2020-12-07 12:19:21 UTC; rsb
 Author: Roger Bivand [cre, aut],
   Rainer Krug [ctb],
   Markus Neteler [ctb],
   Sebastian Jeworutzki [ctb]
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2019-08-06 09:10:02 UTC
+Date/Publication: 2020-12-07 13:10:02 UTC

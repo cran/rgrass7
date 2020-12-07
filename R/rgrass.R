@@ -1,8 +1,8 @@
 # Interpreted GRASS 7 interface functions
-# Copyright (c) 2015 Roger S. Bivand
+# Copyright (c) 2015-20 Roger S. Bivand
 #
 
-gmeta <- function(ignore.stderr = FALSE) {
+gmeta <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -39,7 +39,7 @@ gmeta <- function(ignore.stderr = FALSE) {
 	if (length(lres$depths) == 0) 
 		lres$depths <- abs(as.integer((lres$t-lres$b)/lres$tbres))
 	else lres$depths <- as.integer(lres$depths)
-	lres$proj4 <- getLocationProj()
+	lres$proj4 <- getLocationProj(g.proj_WKT=g.proj_WKT)
         gisenv <- execGRASS("g.gisenv", flags="n", intern=TRUE,
             ignore.stderr=ignore.stderr)
 	gisenv <- gsub("[';]", "", gisenv)
@@ -66,7 +66,9 @@ print.gmeta <- function(x, ...) {
     cat("east       ", x$e, "\n")
     cat("nsres      ", x$nsres, "\n")
     cat("ewres      ", x$ewres, "\n")
-    cat("projection ", paste(strwrap(x$proj4), collapse="\n"), "\n")
+    if (substr(x$proj4, 1, 1) == "+") cat("projection ",
+        paste(strwrap(x$proj4), collapse="\n"), "\n")
+    else cat("projection:\n", x$proj4, "\n")
     invisible(x)
 }
 
@@ -85,12 +87,25 @@ gmeta2grd <- function(ignore.stderr = FALSE) {
 
 
 
-getLocationProj <- function(ignore.stderr = FALSE) {
+getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 # too strict assumption on g.proj Rohan Sadler 20050928
-        if (get.suppressEchoCmdInFuncOption()) {
-            inEchoCmd <- get.echoCmdOption()
-             tull <- set.echoCmdOption(FALSE)
-        }
+    if (get.suppressEchoCmdInFuncOption()) {
+        inEchoCmd <- get.echoCmdOption()
+         tull <- set.echoCmdOption(FALSE)
+    }
+    gv <- .grassVersion()
+    WKT2 <- gv >= "GRASS 7.6" 
+    if (!is.null(g.proj_WKT)) {
+        stopifnot(is.logical(g.proj_WKT))
+        stopifnot(length(g.proj_WKT) == 1L)
+        if (gv < "GRASS 7.6" || g.proj_WKT)
+            warning("Only Proj4 string representation for GRASS < 7.6")
+        if (!g.proj_WKT) WKT2 <- FALSE
+    }
+    if (gv >= "GRASS 7.6" && WKT2) {
+        res <- paste(execGRASS("g.proj", flags=c("w"), intern=TRUE, 
+            ignore.stderr=ignore.stderr), collapse="\n")
+    } else {
         projstr <- execGRASS("g.proj", flags=c("j", "f"), intern=TRUE, 
             ignore.stderr=ignore.stderr)
 	if (length(grep("XY location", projstr)) > 0)
@@ -113,7 +128,9 @@ getLocationProj <- function(ignore.stderr = FALSE) {
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
         }
-	uprojargs
+	res <- uprojargs
+    }
+    res
 }
 
 .g_findfile <- function(vname, type) {
@@ -171,12 +188,12 @@ use_sf <- function() {
   if (requireNamespace("sf", quietly=TRUE) && 
     requireNamespace("stars", quietly=TRUE))
     assign("R_interface", "sf", envir=.GRASS_CACHE)
-  else stop("sf or stars not available")
+  else stop("sf or stars is not available. You need both packages installed.")
 }
 
 use_sp <- function() {
   if (requireNamespace("sp", quietly=TRUE) && 
      requireNamespace("rgdal", quietly=TRUE))
      assign("R_interface", "sp", envir=.GRASS_CACHE)
-  else stop("sp or rgdal not available")
+  else stop("sp or rgdal is not available. You need both packages installed.")
 }

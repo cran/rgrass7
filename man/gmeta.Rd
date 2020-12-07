@@ -33,8 +33,8 @@
 \usage{
 use_sf()
 use_sp()
-gmeta(ignore.stderr = FALSE)
-getLocationProj(ignore.stderr = FALSE)
+gmeta(ignore.stderr = FALSE, g.proj_WKT=NULL)
+getLocationProj(ignore.stderr = FALSE, g.proj_WKT=NULL)
 gmeta2grd(ignore.stderr = FALSE)
 \method{print}{gmeta}(x, ...)
 get.ignore.stderrOption()
@@ -58,6 +58,7 @@ set.suppressEchoCmdInFuncOption(value)
 }
 \arguments{
   \item{ignore.stderr}{default FALSE, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
+  \item{g.proj_WKT}{default NULL: return WKT2 representation in GRASS >= 7.6 and Proj4 in GRASS < 7.6; may be set to FALSE to return Proj4 for GRASS >= 7.6}
   \item{x}{S3 object returned by gmeta}
   \item{...}{arguments passed through print method}
   \item{value}{logical value for setting options on \code{ignore.stderr} set by default on package load to FALSE, \code{stop_on_no_flags_paras} set by default on package load to TRUE, \code{useGDAL} set by default on package load to TRUE, \code{plugin} set by default on package load to NULL, \code{echoCmd} set by default on package load to FALSE. \code{useIntern} sets the \code{intern} argument globally; \code{legacyExec} sets the \code{legacyExec} option globally, but is initialized to FALSE on unix systems (all but Windows) and TRUE on Windows; \code{defaultFlags} is initialized to NULL, but may be a character vector with values from \code{c("quiet", "verbose")} \code{suppressEchoCmdInFunc} default TRUE suppresses the effect of \code{echoCmd} within package functions, may be set FALSE for debugging.}
@@ -80,7 +81,10 @@ if (run) {
   print(G)
 }
 if (run) {
-  sp::CRS(getLocationProj())
+  cat(getLocationProj(), "\n")
+}
+if (run) {
+  cat(getLocationProj(g.proj_WKT=FALSE), "\n")
 }
 if (run) {
   grd <- gmeta2grd()

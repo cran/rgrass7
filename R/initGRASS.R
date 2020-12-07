@@ -68,6 +68,10 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
             Sys.setenv(GRASS_PROJSHARE=paste(OSGEO4W_ROOT,
                 "\\share\\proj", sep=""))
         } else {
+            unistring <- toupper(gisBase)
+            unistring <- gsub("\\\\", "/", unistring)
+            if (length(grep("OSGEO4W.*/APPS/GRASS", unistring)) > 0)
+                stop("NOTE: If using OSGeo4W GRASS, start R in the OSGeo4W shell,\nsee help(initGRASS) for further details")
             Sys.setenv(GRASS_PROJSHARE=paste(Sys.getenv("GISBASE"),
                 "\\share\\proj", sep=""))
         }
@@ -225,8 +229,11 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     if (!file.exists(pfile)) {
         mSG <- !missing(SG)
         if (mSG) {
+          if (!inherits(SG, "Spatial"))
+            stop("SG is of class", class(SG), "not inheriting from Spatial")
           R_in_sp <- isTRUE(.get_R_interface() == "sp")
-          if (!R_in_sp) stop("no stars SG yet")
+          if (is.null(.get_R_interface())) stop("run use_sp() before this function if SG is not missing")
+          else stop("no stars SG yet")
         }
         if (mSG) bb <- sp::bbox(SG)
         if (mSG) gt <- sp::gridparameters(SG)
