@@ -205,6 +205,7 @@ doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyE
         res <- paste(res, paste("-", flags, collapse=" ", sep=""))
     }
     pt <- do.call("rbind", pcmd$parameters)
+    req <- NULL
     if (!is.null(pt)) {
 # g.version no parameters exception caught by Rainer M Krug 090923
       req <- pt[pt[, "required"] != "no", "name"]
@@ -293,10 +294,12 @@ doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyE
         }
       }
     }
-    if ((!is.null(pt) && is.null(parameters)) && is.null(flags))
+    if (length(req) > 0) {
+      if ((!is.null(pt) && is.null(parameters)) && is.null(flags))
         if (get.stop_on_no_flags_parasOption())
             stop("No flags or parameters provided")
         else warning("No flags or parameters provided")
+    }
     if (echoCmd) cat("GRASS command:", res, "\n")
     attr(res, "cmd") <- cmd
     res
@@ -408,7 +411,95 @@ execGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, intern=NULL,
         attr(res, "resOut") <- resOut
         attr(res, "resErr") <- resErr
     }
+    if (cmd == "g.gui") message("WX GUI lauched - Close GUI manually when finished")
     invisible(res)
+}
+
+stringexecGRASS <- function(string, 
+                            intern=NULL,
+                            ignore.stderr=NULL, 
+                            Sys_ignore.stdout=FALSE, 
+                            Sys_wait=TRUE,
+                            Sys_input=NULL, 
+                            Sys_show.output.on.console=TRUE, 
+                            Sys_minimized=FALSE,
+                            Sys_invisible=TRUE, 
+                            echoCmd=NULL, 
+                            redirect=FALSE, 
+                            legacyExec=NULL) {
+  stopifnot(is.character(string) && length(string) == 1)
+  # extract quoted parameters
+  quoted_params <- regmatches(string, 
+                              gregexpr("\\w+=['\"].*?['\"]", string))[[1]]
+  if (length(quoted_params) > 0) {
+    names(quoted_params) <- regmatches(quoted_params, 
+                                       regexpr("^\\w+", quoted_params))
+    quoted_params <- regmatches(quoted_params, 
+                                regexpr("(?<==['\"]).+(?=['\"]$)", 
+                                        quoted_params, 
+                                        perl = TRUE))
+    quoted_params <- as.list(quoted_params)
+  }
+  # split remaining parts into cmd, flags and simple parameters
+  components <- strsplit(gsub("\\w+=['\"].*?['\"]", "", string), "\\s+")[[1]]
+  cmd <- components[1]
+  if (!grepl("^\\w{1,2}\\.\\w+(\\.\\w+)*$", cmd)) {
+    stop("The string argument of stringexecGRASS() ",
+         "must begin with a valid GRASS command name.")
+  }
+  pattern_flag <- "^-+"
+  flags <- grep(pattern_flag, components, value = TRUE)
+  if (length(flags) > 0) {
+    flags <- sub(pattern_flag, "", flags)
+    } else {
+    flags <- NULL
+  }
+  simple_params <- grep("^\\w+=", components, value = TRUE)
+  if (length(simple_params) > 0) {
+    names(simple_params) <- regmatches(simple_params, 
+                                       regexpr("^\\w+", simple_params))
+    simple_params <- regmatches(simple_params, 
+                                regexpr("(?<==).+$", 
+                                        simple_params, 
+                                        perl = TRUE))
+    simple_params <- as.list(simple_params)
+    simple_params[grep("^[+-]?(\\d*\\.)?\\d+$", simple_params)] <- 
+      as.numeric(simple_params[grep("^[+-]?(\\d*\\.)?\\d+$", simple_params)])
+  }
+  # combine simple and quoted parameters
+  if (length(simple_params) > 0 || length(quoted_params) > 0) {
+    parameters <- c(simple_params, quoted_params)
+  } else {
+    parameters <- NULL
+  }
+  # non-processed parts of 'components' will lead to an error
+  if (length(flags) + length(parameters) + 1 != 
+      length(components) + length(quoted_params)) {
+    stop("stringexecGRASS() could not successfully split the provided string ",
+         "into ONE command name plus (optionally) flags and parameters.\n",
+         "Please check syntax:\n",
+         "- the command name, flags and parameters must be separated by ",
+         "a whitespace\n",
+         "- each parameter must be of the form key=value; ",
+         "if 'value' contains spaces, then 'value' must be quoted\n",
+         "- concatenation of flags (as in 'g.proj -wf') is not supported: ",
+         "use 'g.proj -w -f'\n",
+         "- the command name must come at the beginning\n")
+  }
+  execGRASS(cmd = cmd, 
+            flags=flags, 
+            parameters=parameters, 
+            intern=intern,
+            ignore.stderr=ignore.stderr,
+            Sys_ignore.stdout=Sys_ignore.stdout,
+            Sys_wait=Sys_wait,
+            Sys_input=Sys_input,
+            Sys_show.output.on.console=Sys_show.output.on.console,
+            Sys_minimized=Sys_minimized,
+            Sys_invisible=Sys_invisible,
+            echoCmd=echoCmd,
+            redirect=redirect,
+            legacyExec=legacyExec)
 }
 
 

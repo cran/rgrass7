@@ -6,7 +6,7 @@ importFrom(stats, runif, na.omit)
 importFrom(methods, slot, "slot<-", as)
 
 export(gmeta, getLocationProj, gmeta2grd)
-export(execGRASS, doGRASS, parseGRASS, getXMLencoding, setXMLencoding)
+export(execGRASS, stringexecGRASS, doGRASS, parseGRASS, getXMLencoding, setXMLencoding)
 export(initGRASS, get.GIS_LOCK, set.GIS_LOCK, unset.GIS_LOCK, unlink_.gislock)
 export(remove_GISRC)
 export(readRAST, writeRAST)

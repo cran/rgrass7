@@ -1,12 +1,13 @@
 Package: rgrass7
-Version: 0.2-3
-Date: 2020-12-03
+Version: 0.2-4
+Date: 2021-01-04
 Title: Interface Between GRASS 7 Geographical Information System and R
 Authors@R: c(
-	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
-	person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de"),
-	person("Markus", "Neteler", role = "ctb", email="neteler@osgeo.org"),
-	person("Sebastian", "Jeworutzki", role = "ctb", email="Sebastian.Jeworutzki@rub.de"))
+	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")),
+	person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de", comment=c(ORCID="0000-0002-7490-0066")),
+	person("Markus", "Neteler", role = "ctb", email="neteler@osgeo.org", comment=c(ORCID="0000-0003-1916-1966")),
+	person("Sebastian", "Jeworutzki", role = "ctb", email="Sebastian.Jeworutzki@rub.de", comment=c(ORCID="0000-0002-2671-5253")),
+	person("Floris", "Vanderhaeghe", role = "ctb", email="floris.vanderhaeghe@inbo.be", comment=c(ORCID="0000-0002-6378-6229")))
 Description: Interpreted interface between 'GRASS' 7 geographical 
     information system and R, based on starting R from within the 'GRASS' 'GIS'
     environment, or running free-standing R in a temporary 'GRASS' location;
@@ -25,11 +26,12 @@ Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
         xml1.R
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2020-12-07 12:19:21 UTC; rsb
-Author: Roger Bivand [cre, aut],
-  Rainer Krug [ctb],
-  Markus Neteler [ctb],
-  Sebastian Jeworutzki [ctb]
+Packaged: 2021-01-06 10:29:26 UTC; rsb
+Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>),
+  Rainer Krug [ctb] (<https://orcid.org/0000-0002-7490-0066>),
+  Markus Neteler [ctb] (<https://orcid.org/0000-0003-1916-1966>),
+  Sebastian Jeworutzki [ctb] (<https://orcid.org/0000-0002-2671-5253>),
+  Floris Vanderhaeghe [ctb] (<https://orcid.org/0000-0002-6378-6229>)
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2020-12-07 13:10:02 UTC
+Date/Publication: 2021-01-07 07:00:11 UTC

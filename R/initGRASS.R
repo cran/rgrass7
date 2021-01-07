@@ -104,10 +104,13 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
                     Sys.setenv(PYTHONPATH=paste(GrPyPATH, ePyPATH, sep=";"))
                 else Sys.setenv(PYTHONPATH=GrPyPATH)
             }
-            Sys.setenv("PYTHONHOME"=paste(Sys.getenv("GISBASE"),
-                "Python27", sep="/"))
-            Sys.setenv("GRASS_PYTHON"=paste(Sys.getenv("GISBASE"),
-                "extrabin/python.exe", sep="/"))
+            if (nchar(OSGEO4W_ROOT) > 0) {
+              Sys.setenv("PYTHONHOME"=paste(OSGEO4W_ROOT, "apps/Python37", sep="/"))
+            } else {
+              G_B_files <- list.files(Sys.getenv("GISBASE"))
+              Python_dir <- G_B_files[grep("Python", G_B_files)]
+              if (length(Python_dir) > 0) Sys.setenv("PYTHONHOME"=paste(Sys.getenv("GISBASE"), Python_dir[1], sep="/"))
+            }
 #            pyScripts <- basename(list.files(paste(Sys.getenv("GISBASE"),
 #                "scripts", sep="/"), pattern="py$"))
 #            names(pyScripts) <- sub("\\.py", "", pyScripts)
@@ -141,6 +144,7 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
         gisDbase <- ifelse (use_g.dirseps.exe, system(paste("g.dirseps.exe -g",
             shQuote(gisDbase)), intern=TRUE), gisDbase)
     } else if (SYS == "unix") {
+        OSGEO4W_ROOT <- ""
         Sys.setenv(GISBASE=gisBase)
         if (missing(home)) home <- Sys.getenv("HOME")
         if (missing(addon_base))
@@ -222,7 +226,23 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     if ( !comp ){
         stop( attr(comp, "message") )
     }
-
+    grass_python <- Sys.getenv("GRASS_PYTHON")
+    if (grass_python == "") {
+      if (nchar(OSGEO4W_ROOT) > 0) {
+        if (file.exists(paste(OSGEO4W_ROOT, "bin/python3.exe", sep="/"))) {
+          Sys.setenv("GRASS_PYTHON"=paste(OSGEO4W_ROOT, "bin/python3.exe", sep="/"))
+        } else {
+          Sys.setenv("GRASS_PYTHON"=paste(OSGEO4W_ROOT, "bin/python.exe", sep="/"))
+        }
+      } else {
+        if (strsplit(system(paste("g.version", get("addEXE", envir=.GRASS_CACHE), " -g ", sep=""), intern=TRUE)[1], "=")[[1]][2] > "7.6.1")
+            Sys.setenv("GRASS_PYTHON"=paste("python3", get("addEXE",
+                envir=.GRASS_CACHE), sep=""))
+        else
+            Sys.setenv("GRASS_PYTHON"=paste("python", get("addEXE",
+                envir=.GRASS_CACHE), sep=""))
+      }
+    }
     
     assign("GV", gv, envir=.GRASS_CACHE)
     pfile <- paste(loc_path, "PERMANENT", "DEFAULT_WIND", sep="/")

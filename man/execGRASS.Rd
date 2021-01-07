@@ -1,5 +1,6 @@
 \name{execGRASS}
 \alias{execGRASS}
+\alias{stringexecGRASS}
 \alias{doGRASS}
 \alias{parseGRASS}
 \alias{getXMLencoding}
@@ -12,6 +13,10 @@
 }
 \usage{
 execGRASS(cmd, flags = NULL, ..., parameters = NULL, intern = NULL,
+ ignore.stderr = NULL, Sys_ignore.stdout=FALSE, Sys_wait=TRUE,
+ Sys_input=NULL, Sys_show.output.on.console=TRUE, Sys_minimized=FALSE,
+ Sys_invisible=TRUE, echoCmd=NULL, redirect=FALSE, legacyExec=NULL)
+stringexecGRASS(string, intern = NULL,
  ignore.stderr = NULL, Sys_ignore.stdout=FALSE, Sys_wait=TRUE,
  Sys_input=NULL, Sys_show.output.on.console=TRUE, Sys_minimized=FALSE,
  Sys_invisible=TRUE, echoCmd=NULL, redirect=FALSE, legacyExec=NULL)
@@ -28,6 +33,8 @@ setXMLencoding(enc)
   \item{flags}{character vector of GRASS command flags}
   \item{...}{for \code{execGRASS} and \code{doGRASS}, GRASS module parameters given as R named arguments directly. For the \code{print} method, other arguments to print method. The storage modes of values passed must match thos required in GRASS, so a single GRASS string must be a character vector of length 1, a single GRASS integer must be an integer vector of length 1 (may be an integer constant such as 10L), and a single GRASS float must be a numeric vector of length 1. For multiple values, use vectors of suitable length}
   \item{parameters}{list of GRASS command parameters, used if GRASS parameters are not given as R arguments directly; the two methods for passing GRASS parameters may not be mixed. The storage modes of values passed must match thos required in GRASS, so a single GRASS string must be a character vector of length 1, a single GRASS integer must be an integer vector of length 1 (may be an integer constant such as 10L), and a single GRASS float must be a numeric vector of length 1. For multiple values, use vectors of suitable length}
+  \item{string}{a string representing \emph{one} full GRASS statement, using shell syntax: command name, optionally followed by flags and parameters, all separated by whitespaces.
+  Parameters follow the key=value format; if 'value' contains spaces, then 'value' must be quoted}
   \item{intern}{default NULL, in which case set internally from \code{get.useInternOption}; a logical (not 'NA') which indicates whether to make the output of the command an R object. Not available unless 'popen' is supported on the platform}
   \item{ignore.stderr}{default NULL, taking the value set by \code{set.ignore.stderrOption}, a logical indicating whether error messages written to 'stderr' should be ignored}
   \item{Sys_ignore.stdout, Sys_wait, Sys_input}{pass extra arguments to \code{system}}
@@ -40,9 +47,13 @@ setXMLencoding(enc)
 }
 \details{
   \code{parseGRASS} checks to see whether the GRASS command has been parsed already and cached in this session; if not, it reads the interface description, parses it and caches it for future use. \code{doGRASS} assembles a proposed GRASS command with flags and parameters as a string, wrapping \code{parseGRASS}, and \code{execGRASS} is a wrapper for \code{doGRASS}, running the command through \code{system} (from 0.7-4, the \code{...} argument is not used for passing extra arguments for \code{system}). The command string is termed proposed, because not all of the particular needs of commands are provided by the interface description, and no check is made for the existence of input objects. Support for multiple parameter values added with help from Patrick Caldon. Support for defaults and for direct use of GRASS parameters instead of a parameter list suggested by Rainer Krug.
+  
+  \code{stringexecGRASS} is a wrapper around \code{execGRASS}, and accepts a single shell statement as a string (following GRASS's command syntax).
 }
+
 \value{
-  \code{parseGRASS} returns a \code{GRASS_interface_desc} object, \code{doGRASS} returns a character string with a proposed GRASS command - the expanded command name is returned as an attribute, and \code{execGRASS} returns what \code{system} or \code{system2} return, particularly depending on the \code{intern} argument when the character strings output by GRASS modules are returned. If \code{intern} is \code{FALSE}, \code{system} returns the module exit code, while \code{system2} returns the module exit code with \dQuote{resOut} and \dQuote{resErr} attributes.}
+  \code{parseGRASS} returns a \code{GRASS_interface_desc} object, \code{doGRASS} returns a character string with a proposed GRASS command - the expanded command name is returned as an attribute, and \code{execGRASS} and  \code{stringexecGRASS} return what \code{system} or \code{system2} return, particularly depending on the \code{intern} argument when the character strings output by GRASS modules are returned.
+  If \code{intern} is \code{FALSE}, \code{system} returns the module exit code, while \code{system2} returns the module exit code with \dQuote{resOut} and \dQuote{resErr} attributes.}
 
 
 \note{If any package command fails with a UTF-8 error from the XML package, try using \code{setXMLencoding} to work around the problem that GRASS modules declare --interface-description output as UTF-8 without ensuring that it is (French is of 6.4.0 RC5 latin1).}
@@ -95,6 +106,18 @@ if (run) {
       flags = c("C", "n"), redirect=TRUE, legacyExec=TRUE)
     print(resERR)
   }
+}
+if (run) {
+  res <- stringexecGRASS("r.stats -p -l input=geology", intern=TRUE)
+  print(res)
+}
+if (run) {
+  stringexecGRASS(paste("r.random.cells --overwrite --quiet output=samples",
+    "distance=1000 ncells=100 seed=1"))
+}
+if (run) {
+  execGRASS("r.random.cells", flags=c("overwrite", "quiet"), output="samples", distance=1000,
+    ncells=100L, seed=1L)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
