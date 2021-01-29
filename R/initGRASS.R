@@ -252,8 +252,10 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
           if (!inherits(SG, "Spatial"))
             stop("SG is of class", class(SG), "not inheriting from Spatial")
           R_in_sp <- isTRUE(.get_R_interface() == "sp")
-          if (is.null(.get_R_interface())) stop("run use_sp() before this function if SG is not missing")
-          else stop("no stars SG yet")
+          if (is.null(.get_R_interface()) || !R_in_sp) {
+            use_sp()
+            warning("use_sp() was set because SG was given")
+          }
         }
         if (mSG) bb <- sp::bbox(SG)
         if (mSG) gt <- sp::gridparameters(SG)

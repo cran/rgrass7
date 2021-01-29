@@ -1,10 +1,14 @@
-# Version 0.2-4 (development)
+# version 0.2-5 (development)
+
+* #23 (Mira Kattwinkel) fix regression impacting **openSTARS**.
+
+# Version 0.2-4 (2021-01-07)
 
 * #17-19 Suggestion and PR by Floris Vanderhaege to pass an unparsed string with a GRASS command, possible flags and parameters through execGRASS(). Implemented in stringexecGRASS().
 
-* #20 to improve handling of GRASS commands with no flags or parameters, special-casing "g.gui", thanks to Floris Vanderhaege
+* #20 to improve handling of GRASS commands with no flags or parameters, special-casing "g.gui", thanks to Floris Vanderhaege.
 
-* #21 updating stale GRASS_PYTHON settings in initGRASS(); for GRASS >= 7.8, python3 is used, for earier GRASS python2.
+* #21-22 updating stale GRASS_PYTHON settings in initGRASS(); for GRASS >= 7.8, python3 is used, for earier GRASS python2.
 
 
 # Version 0.2-3 (2020-12-07)

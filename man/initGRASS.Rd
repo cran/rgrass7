@@ -27,7 +27,7 @@ remove_GISRC()
 \arguments{
   \item{gisBase}{The directory path to GRASS binaries and libraries, containing bin and lib subdirectories among others}
   \item{home}{The directory in which to create the .gisrc file; defaults to \code{$HOME} on Unix systems and to \code{USERPROFILE} on Windows systems; can usually be set to \code{tempdir()}}
-  \item{SG}{An optional \code{SpatialGrid} object to define the \code{DEFAULT_WIND} of the temporary location}
+  \item{SG}{An optional \code{SpatialGrid} object to define the \code{DEFAULT_WIND} of the temporary location; if \code{use_sp()} has not been called, it will be called internally if \code{SG} is given as an object inheriting from \code{"Spatial"}; if \code{use_sf()} has been called, it will be overridden internally as only objects inheriting from \code{"Spatial"} may be given.}
   \item{gisDbase}{if missing, \code{tempdir()} will be used; GRASS GISDBASE directory for the working session}
   \item{addon_base}{if missing, assumed to be \dQuote{$HOME/.grass7/addons} on Unix-like platforms, on MS Windows \dQuote{\%APPDATA\%\\GRASS7\\addons}, and checked for existence}
   \item{location}{if missing, \code{basename(tempfile())} will be used; GRASS location directory for the working session}

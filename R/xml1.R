@@ -411,7 +411,7 @@ execGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, intern=NULL,
         attr(res, "resOut") <- resOut
         attr(res, "resErr") <- resErr
     }
-    if (cmd == "g.gui") message("WX GUI lauched - Close GUI manually when finished")
+    if (cmd == "g.gui") message("WX GUI launched - Close GUI manually when finished")
     invisible(res)
 }
 
