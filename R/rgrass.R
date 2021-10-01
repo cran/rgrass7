@@ -66,9 +66,10 @@ print.gmeta <- function(x, ...) {
     cat("east       ", x$e, "\n")
     cat("nsres      ", x$nsres, "\n")
     cat("ewres      ", x$ewres, "\n")
-    if (substr(x$proj4, 1, 1) == "+") cat("projection ",
-        paste(strwrap(x$proj4), collapse="\n"), "\n")
-    else cat("projection:\n", x$proj4, "\n")
+    if (is.character(x$proj4[1]) && !nzchar(x$proj4[1]))
+        if (substr(x$proj4[1], 1, 1) == "+") 
+            cat("projection ", paste(strwrap(x$proj4), collapse="\n"), "\n")
+        else cat("projection:\n", x$proj4[1], "\n")
     invisible(x)
 }
 
@@ -95,6 +96,9 @@ getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
     }
     gv <- .grassVersion()
     WKT2 <- gv >= "GRASS 7.6" 
+    old_rgdal <- TRUE
+    if (requireNamespace("rgdal", quietly = TRUE)) 
+        old_rgdal <- packageVersion("rgdal") < "1.5.1"
     if (!is.null(g.proj_WKT)) {
         stopifnot(is.logical(g.proj_WKT))
         stopifnot(length(g.proj_WKT) == 1L)
@@ -102,35 +106,40 @@ getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
             warning("Only Proj4 string representation for GRASS < 7.6")
         if (!g.proj_WKT) WKT2 <- FALSE
     }
-    if (gv >= "GRASS 7.6" && WKT2) {
+    if (WKT2 && !old_rgdal) {
         res <- paste(execGRASS("g.proj", flags=c("w"), intern=TRUE, 
             ignore.stderr=ignore.stderr), collapse="\n")
-    } else {
-        projstr <- execGRASS("g.proj", flags=c("j", "f"), intern=TRUE, 
-            ignore.stderr=ignore.stderr)
-	if (length(grep("XY location", projstr)) > 0)
-		projstr <- as.character(NA)
-	if (length(grep("latlong", projstr)) > 0)
-		projstr <- sub("latlong", "longlat", projstr)
-    	if (is.na(projstr)) uprojargs <- projstr
+        if (substr(res, 1, 5) != "ERROR") {
+            if (nchar(res) == 0L) {
+                res <- paste(execGRASS("g.proj", flags=c("j"), intern=TRUE, 
+                    ignore.stderr=ignore.stderr), collapse=" ")
+            }
+            return(res)
+        }
+    }
+    projstr <- execGRASS("g.proj", flags=c("j", "f"), intern=TRUE, 
+        ignore.stderr=ignore.stderr)
+    if (length(grep("XY location", projstr)) > 0)
+	projstr <- as.character(NA)
+    if (length(grep("latlong", projstr)) > 0)
+	projstr <- sub("latlong", "longlat", projstr)
+    if (is.na(projstr)) uprojargs <- projstr
     	else uprojargs <- paste(unique(unlist(strsplit(projstr, " "))), 
 		collapse=" ")
-    	if (length(grep("= ", uprojargs)) != 0) {
-		warning(paste("No spaces permitted in PROJ4",
-			"argument-value pairs:", uprojargs))
-		uprojargs <- as.character(NA)
-	}
-    	if (length(grep(" [:alnum:]", uprojargs)) != 0) {
-		warning(paste("PROJ4 argument-value pairs",
-			"must begin with +:", uprojargs))
-		uprojargs <- as.character(NA)
-	}
-        if (get.suppressEchoCmdInFuncOption()) {
-            tull <- set.echoCmdOption(inEchoCmd)
-        }
-	res <- uprojargs
+    if (length(grep("= ", uprojargs)) != 0) {
+	warning(paste("No spaces permitted in PROJ4",
+		"argument-value pairs:", uprojargs))
+	uprojargs <- as.character(NA)
     }
-    res
+    if (length(grep(" [:alnum:]", uprojargs)) != 0) {
+	warning(paste("PROJ4 argument-value pairs",
+		"must begin with +:", uprojargs))
+	uprojargs <- as.character(NA)
+    }
+    if (get.suppressEchoCmdInFuncOption()) {
+        tull <- set.echoCmdOption(inEchoCmd)
+    }
+    uprojargs
 }
 
 .g_findfile <- function(vname, type) {
