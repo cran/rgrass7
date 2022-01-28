@@ -1,14 +1,14 @@
 Package: rgrass7
-Version: 0.2-6
-Date: 2021-09-30
-Title: Interface Between GRASS 7 Geographical Information System and R
+Version: 0.2-7
+Date: 2022-01-21
+Title: Interface Between GRASS Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")),
 	person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de", comment=c(ORCID="0000-0002-7490-0066")),
 	person("Markus", "Neteler", role = "ctb", email="neteler@osgeo.org", comment=c(ORCID="0000-0003-1916-1966")),
 	person("Sebastian", "Jeworutzki", role = "ctb", email="Sebastian.Jeworutzki@rub.de", comment=c(ORCID="0000-0002-2671-5253")),
 	person("Floris", "Vanderhaeghe", role = "ctb", email="floris.vanderhaeghe@inbo.be", comment=c(ORCID="0000-0002-6378-6229")))
-Description: Interpreted interface between 'GRASS' 7 geographical 
+Description: Interpreted interface between 'GRASS' geographical 
     information system and R, based on starting R from within the 'GRASS' 'GIS'
     environment, or running free-standing R in a temporary 'GRASS' location;
     the package provides facilities for using all 'GRASS' commands from the 
@@ -19,14 +19,14 @@ Imports: stats, utils, methods
 Suggests: rgdal (>= 1.0-6), RSQLite, sp (>= 0.9), sf (>= 0.7.6), stars
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
-URL: https://grass.osgeo.org/, https://github.com/rsbivand/rgrass7,
-        https://rsbivand.github.io/rgrass7/
-BugReports: https://github.com/rsbivand/rgrass7/issues/
+URL: https://grass.osgeo.org/, https://github.com/rsbivand/rgrass,
+        https://rsbivand.github.io/rgrass/
+BugReports: https://github.com/rsbivand/rgrass/issues/
 Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R
         xml1.R
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2021-10-01 15:06:22 UTC; rsb
+Packaged: 2022-01-28 16:19:26 UTC; rsb
 Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>),
   Rainer Krug [ctb] (<https://orcid.org/0000-0002-7490-0066>),
   Markus Neteler [ctb] (<https://orcid.org/0000-0003-1916-1966>),
@@ -34,4 +34,4 @@ Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>),
   Floris Vanderhaeghe [ctb] (<https://orcid.org/0000-0002-6378-6229>)
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2021-10-01 15:50:02 UTC
+Date/Publication: 2022-01-28 17:10:02 UTC

@@ -8,9 +8,9 @@
 \alias{vDataCount}
 \alias{vect2neigh}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Read and write GRASS 7 vector object files}
+\title{Read and write GRASS vector object files}
 \description{
-  \code{readVECT} moves one GRASS 7 vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 7 vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
+  \code{readVECT} moves one GRASS vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
 }
 \usage{
 readVECT(vname, layer, type=NULL, plugin=NULL,
@@ -28,7 +28,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{vname}{A GRASS 7 vector file name}
+  \item{vname}{A GRASS vector file name}
   \item{layer}{a layer name (string); if missing set to default of \dQuote{1}}
   \item{type}{override type detection when multiple types are non-zero, passed to v.out.ogr}
   \item{plugin}{default NULL if which case it will be set to the value set by \code{set.pluginOption}; NULL for auto-detection, may be set to FALSE to avoid or TRUE if the plugin is known to be available; if the plugin is used, no further arguments other than mapset are respected}
@@ -36,13 +36,13 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
   \item{ignore.stderr}{default the value set by
     \code{set.ignore.stderrOption}; NULL, taking the value set by \code{set.ignore.stderrOption}, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
   \item{with_prj}{default TRUE, write ESRI-style PRJ file for transfered data}
-  \item{with_c}{default FALSE in GRASS 7; if FALSE, export features with category (labeled) only; if not default, all features are exported, including GRASS \dQuote{islands} which are probably spurious exterior rings filling holes.}
+  \item{with_c}{default FALSE in GRASS; if FALSE, export features with category (labeled) only; if not default, all features are exported, including GRASS \dQuote{islands} which are probably spurious exterior rings filling holes.}
   \item{mapset}{if plugin is TRUE, the mapset of the file to be imported may be changed from the current mapset by passing a character string}
   \item{pointDropZ}{default FALSE, if TRUE, discard third coordinates for point geometries; third coordinates are alway discarded for line and polygon geometries}
   \item{driver}{default NULL, which will lead to the choice of the first driver found in a ordered preferred vector, currently \code{c("SQLite", "ESRI Shapefile")}; a valid OGR writable driver name to define the file format for intermediate files, one of \code{c("GML", "SQLite"), c("ESRI_Shapefile", "MapInfo_File")} is preferred as these construct the names of the intermediate files adequately}
   \item{min_area}{default 0.0001); Minimum size of area to be imported (square meters) Smaller areas and islands are ignored. Should be greater than snap^2}
   \item{snap}{default -1); Snapping threshold for boundaries (map units). '-1' for no snap}
-  \item{SDF}{A Spatial*DataFrame to be moved to GRASS 7 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects, or an equivalent \code{"sf"} object}
+  \item{SDF}{A Spatial*DataFrame to be moved to GRASS as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects, or an equivalent \code{"sf"} object}
   \item{v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
   \item{ID}{A valid DB column name for unique identifiers (optional)}
   \item{remove}{default TRUE, remove copied vectors created in \code{vect2neigh}}
@@ -51,7 +51,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
 
 }
 \value{
-   \code{readVECT} imports a GRASS 7 vector object into an Spatial*DataFrame or equivalent \code{"sf"} object with the type determined by the type of the GRASS 7 vector object. \code{readVECT} and \code{writeVECT} attempt to preserve longer column/field names despite using the \dQuote{ESRI Shapefile} format for transfer.
+   \code{readVECT} imports a GRASS vector object into an Spatial*DataFrame or equivalent \code{"sf"} object with the type determined by the type of the GRASS vector object. \code{readVECT} and \code{writeVECT} attempt to preserve longer column/field names despite using the \dQuote{ESRI Shapefile} format for transfer.
 
 \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
 

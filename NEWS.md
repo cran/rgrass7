@@ -1,4 +1,12 @@
-# version 0.2-6 (development)
+# version 0.2-7 (development)
+
+* change repo name and links
+
+* use `g.remove` in `vect2neigh()` to avoid duplicate temporary files #36
+
+* add `.github/CONTRIBUTING.md`
+
+# version 0.2-6 (2021-10-01)
 
 * #32 `proj.db` mismatch in Windows stand-alone GRASS 7.8.5 (9.8.6) and recent **rgdal** Windows CRAN binary (10.008), if WKT look-up fails, fallback to GRASS Proj4 string.
 

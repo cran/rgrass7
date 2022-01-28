@@ -743,12 +743,15 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 	
 	pid <- as.integer(round(runif(1, 1, 1000)))
 	vname2 <- paste(vname, pid, sep="")
+        tull <- execGRASS("g.remove", type="vector", name=vname2, flags="f",
+            intern=TRUE, ignore.stderr=ignore.stderr)
 #	cmd <- paste(paste("g.copy", .addexe(), sep=""),
 #                    " vect=", vname, ",", vname2, sep="")
 #	if(.Platform$OS.type == "windows") tull <- system(cmd, intern=TRUE)
 #	else tull <- system(cmd, intern=TRUE, ignore.stderr=ignore.stderr)
         tull <- execGRASS("g.copy", vector=paste(vname, 
-            vname2, sep=","), intern=TRUE, ignore.stderr=ignore.stderr)
+            vname2, sep=","), flags="overwrite", intern=TRUE,
+            ignore.stderr=ignore.stderr)
         vname2_was_null <- TRUE
     }
     vname2a <- paste(vname2, "a", sep="")

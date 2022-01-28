@@ -7,7 +7,7 @@ Interface between GRASS geographical information system and R
 }
 \description{
 Interpreted interface between GRASS geographical
-information system, version 7, and R, based on starting R from within the
+information system, versions 7 and 8, and R, based on starting R from within the
 GRASS environment, or on running R stand-alone and creating a throw-away GRASS environment from within R. The interface uses classes defined in the sp package
 to hold spatial data.
 }

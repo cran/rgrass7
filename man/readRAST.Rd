@@ -2,9 +2,9 @@
 \name{readRAST}
 \alias{readRAST}
 \alias{writeRAST}
-\title{Read and write GRASS 7 raster files}
+\title{Read and write GRASS raster files}
 \description{
-Read GRASS 7 raster files from GRASS 7 into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS 7. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin for speed reasons. 
+Read GRASS raster files from GRASS into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin for speed reasons. 
 }
 
 
@@ -20,7 +20,7 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{vname}{A vector of GRASS 7 raster file names}
+  \item{vname}{A vector of GRASS raster file names}
   \item{cat}{default NULL; if not NULL, must be a logical vector matching vname, stating which (CELL) rasters to return as factor}
   \item{ignore.stderr}{default taking the value set by \code{set.ignore.stderrOption}; can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
   \item{plugin}{default taking the value set by \code{set.pluginOption};
