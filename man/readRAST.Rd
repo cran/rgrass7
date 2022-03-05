@@ -1,10 +1,12 @@
-% Copyright (C) 2005-2015 Roger S. Bivand
+% Copyright (C) 2005-2022 Roger S. Bivand
 \name{readRAST}
 \alias{readRAST}
 \alias{writeRAST}
+\alias{read_RAST}
+\alias{write_RAST}
 \title{Read and write GRASS raster files}
 \description{
-Read GRASS raster files from GRASS into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin for speed reasons. 
+Read GRASS raster files from GRASS into R \pkg{sp} \code{"SpatialGridDataFrame"} or \pkg{terra} \code{"SpatRaster"} objects, and write single columns of \pkg{sp} \code{"SpatialGridDataFrame"} or \pkg{terra} \code{"SpatRaster"} objects to GRASS. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin for speed reasons. \code{read_RAST()} and \code{write_RAST()} use \code{"RRASTER"} files written and read by GDAL. 
 }
 
 
@@ -14,14 +16,19 @@ readRAST(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
  NODATA=NULL, plugin=get.pluginOption(), mapset=NULL,
  useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
  driverFileExt=NULL, return_SGDF=TRUE)
+read_RAST(vname, cat=NULL, NODATA=NULL, ignore.stderr=get.ignore.stderrOption(),
+ return_format="SGDF", close_OK=return_format=="SGDF", flags=NULL)
 writeRAST(x, vname, zcol = 1, NODATA=NULL,
  ignore.stderr = get.ignore.stderrOption(), useGDAL=get.useGDALOption(),
  overwrite=FALSE, flags=NULL, drivername="GTiff")
+write_RAST(x, vname, zcol = 1, NODATA=NULL, flags=NULL, 
+ ignore.stderr = get.ignore.stderrOption(), overwrite=FALSE, verbose=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{vname}{A vector of GRASS raster file names}
   \item{cat}{default NULL; if not NULL, must be a logical vector matching vname, stating which (CELL) rasters to return as factor}
+  \item{return_format}{For \code{read_RAST()}, either \code{"SGDF"} or \code{"terra"}}
   \item{ignore.stderr}{default taking the value set by \code{set.ignore.stderrOption}; can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
   \item{plugin}{default taking the value set by \code{set.pluginOption};
     NULL does auto-detection, changes to FALSE if vname is longer than 1, and a sanity check will be run on raster and current region, and the function will revert to FALSE if mismatch is found; if TRUE, the plugin is available and the raster should be read in its original region and resolution; if the plugin is used, no further arguments other than mapset are respected}
@@ -31,11 +38,12 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL,
   \item{drivername}{default \code{"GTiff"}; a valid GDAL writable driver name to define the file format for intermediate files}
   \item{driverFileExt}{default NULL; otherwise string value of required driver file name extension}
   \item{return_SGDF}{default TRUE returning a \code{SpatialGridDataFrame} object, if FALSE, return a list with a \code{GridTopology} object, a list of bands, and a proj4string; see example below}
-  \item{x}{A SpatialGridDataFrame object for export to GRASS as a raster layer}
+  \item{x}{A SpatialGridDataFrame object for export to GRASS as a raster layer, for \code{write_RAST()} a \pkg{terra} \code{"SpatRaster"} object}
   \item{zcol}{Attribute column number or name}
   \item{NODATA}{by default NULL, in which case it is set to one less than \code{floor()}of the data values, otherwise an integer NODATA value (required to be integer by GRASS r.out.bin)}
   \item{overwrite}{default FALSE, if TRUE inserts \code{"overwrite"} into the value of the \code{flags} argument if not already there to allow existing GRASS rasters to be overwritten}
   \item{flags}{default NULL, character vector, for example \code{"overwrite"}}
+  \item{verbose}{default TRUE, report how writing to GRASS is specified}
 %  \item{colname}{alternative name for data column if not file basename}
 %  \item{integer}{logical value: TRUE if the input data is integer}
 }
@@ -136,6 +144,17 @@ if (run) {
 }
 if (run) {
   execGRASS("g.remove", flags="f", name="basins0", type="raster")
+}
+run <- run && require("terra", quietly=TRUE)
+if (run) {
+  v1 <- read_RAST("landuse", cat=TRUE, return_format="terra")
+  v1
+  inMemory(v1)
+}
+if (run) {
+  write_RAST(v1, "landuse1", flags=c("o", "overwrite"))
+  execGRASS("r.stats", flags="c", input="landuse1")
+  execGRASS("g.remove", flags="f", name="landuse1", type="raster")
 }
   Sys.setenv("GRASS_VERBOSE"=GV)
   set.ignore.stderrOption(ois)

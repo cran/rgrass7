@@ -11,7 +11,8 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
     if (is.null(res)) {
         ext <- get("addEXE", envir=.GRASS_CACHE)
         WN_bat <- get("WN_bat", envir=.GRASS_CACHE)
-        if (get("SYS", envir=.GRASS_CACHE) == "WinNat" && nchar(WN_bat) == 0) {
+        if (get("SYS", envir=.GRASS_CACHE) == "WinNat" &&
+            (length(WN_bat) == 1L && nchar(WN_bat) == 0)) {
             WN_bat <- sub(".bat", "", 
                 list.files(paste(Sys.getenv("GISBASE"), "bin", sep="/"),
                 pattern=".bat$"))
@@ -19,8 +20,8 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
                 t0 <- try(sub(".bat", "", 
                    list.files(paste(Sys.getenv("GRASS_ADDON_BASE"),
                        "bin", sep="/"), pattern=".bat$")), silent=TRUE)
-                if (length(t0) > 0 && class(t0) != "try-error" &&
-                   is.character(t0) && nchar(t0) > 0)
+                if (length(t0) > 0 && !inherits(t0, "try-error") &&
+                   is.character(t0) && all(nchar(t0) > 0))
                    WN_bat <- c(WN_bat, t0)
             }
             assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
@@ -33,7 +34,7 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
         cmd0 <- paste(paste(prep, cmd, ext, sep=""), "--interface-description")
         if (legacyExec) {
             tr <- try(system(cmd0, intern=TRUE))
-	    if (class(tr) == "try-error") stop(paste(cmd, "not found"))
+	    if (inherits(tr, "try-error")) stop(paste(cmd, "not found"))
         } else {
             errFile <- tempfile()
             outFile <- tempfile()

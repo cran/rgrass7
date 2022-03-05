@@ -3,8 +3,9 @@
 import(XML)
 importFrom(utils, packageDescription, read.table)
 importFrom(stats, runif, na.omit)
-importFrom(methods, slot, "slot<-", as)
-importFrom("utils", "packageVersion")
+importFrom(methods, slot, "slot<-", as, "getMethod")
+importFrom("utils", "packageVersion", "write.table")
+importFrom("grDevices", "rgb")
 
 export(gmeta, getLocationProj, gmeta2grd)
 export(execGRASS, stringexecGRASS, doGRASS, parseGRASS, getXMLencoding, setXMLencoding)
@@ -20,6 +21,8 @@ export(set.ignore.stderrOption, get.ignore.stderrOption, set.useGDALOption,
  set.useInternOption, get.legacyExecOption, set.legacyExecOption,
  get.defaultFlagsOption, set.defaultFlagsOption,
  get.suppressEchoCmdInFuncOption, set.suppressEchoCmdInFuncOption)
+
+export(read_VECT, write_VECT, read_RAST, write_RAST)
 
 S3method(print, gmeta)
 S3method(print, GRASS_interface_desc)

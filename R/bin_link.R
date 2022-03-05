@@ -6,6 +6,8 @@ readRAST <- function(vname, cat=NULL, ignore.stderr=get.ignore.stderrOption(),
 	NODATA=NULL, plugin=get.pluginOption(), mapset=NULL, 
         useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
         driverFileExt=NULL, return_SGDF=TRUE) {
+    .Deprecated(new="read_RAST", package="rgrass7", old="readRAST",
+        msg="Package rgrass7 is transitioning to package rgrass for GRASS GIS 8.\n'readRAST' is deprecated. Use 'read_RAST' instead.")
 
     R_in_sp <- isTRUE(.get_R_interface() == "sp")
 
@@ -66,7 +68,11 @@ readRAST <- function(vname, cat=NULL, ignore.stderr=get.ignore.stderrOption(),
 
 	if (!R_in_sp) stop("no stars import yet")
         
-	p4 <- sp::CRS(getLocationProj())
+	gLP <- getLocationProj()
+	if (gLP == "XY location (unprojected)")
+            p4 <- sp::CRS(as.character(NA))
+        else
+            p4 <- sp::CRS(gLP)
 
         reslist <- vector(mode="list", length=length(vname))
         names(reslist) <- vname
@@ -219,6 +225,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr=get.ignore.stderrOption(),
                                     catlabs <- paste(catlabs, catnos, sep="_")
                                     warning("non-unique category labels; category number appended")
                                 }
+# https://files.nc.gov/ncdeq/Energy+Mineral+and+Land+Resources/Geological+Survey/1985_state_geologic_map_500000_scale.pdf (catnos vector polygon IDs)
 				resa@data[[i]] <- factor(resa@data[[i]], 
 					levels=catnos, labels=catlabs)
 			}
@@ -392,6 +399,8 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
 	ignore.stderr = get.ignore.stderrOption(), useGDAL=get.useGDALOption(), overwrite=FALSE, flags=NULL,
         drivername="GTiff") {
 
+        .Deprecated(new="write_RAST", package="rgrass7", old="writeRAST",
+           msg="Package rgrass7 transitioning to package rgrass for GRASS 8.\n'writeRAST' is deprecated. Use 'write_RAST' instead.")
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- set.echoCmdOption(FALSE)
         }

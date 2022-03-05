@@ -66,7 +66,7 @@ print.gmeta <- function(x, ...) {
     cat("east       ", x$e, "\n")
     cat("nsres      ", x$nsres, "\n")
     cat("ewres      ", x$ewres, "\n")
-    if (is.character(x$proj4[1]) && !nzchar(x$proj4[1]))
+    if (is.character(x$proj4[1]) && nzchar(x$proj4[1]))
         if (substr(x$proj4[1], 1, 1) == "+") 
             cat("projection ", paste(strwrap(x$proj4), collapse="\n"), "\n")
         else cat("projection:\n", x$proj4[1], "\n")
@@ -74,12 +74,12 @@ print.gmeta <- function(x, ...) {
 }
 
 gmeta2grd <- function(ignore.stderr = FALSE) {
+	if (!requireNamespace("sp", quietly=TRUE))
+		stop("sp required to creat a GridTopology object")
 	G <- gmeta(ignore.stderr=ignore.stderr)
 	cellcentre.offset <- c(G$w+(G$ewres/2), G$s+(G$nsres/2))
 	cellsize <- c(G$ewres, G$nsres)
 	cells.dim <- c(G$cols, G$rows)
-        R_in_sp <- isTRUE(.get_R_interface() == "sp")
-        if (!R_in_sp) stop("no stars grid yet")
 
 	grd <- sp::GridTopology(cellcentre.offset=cellcentre.offset, 
 		cellsize=cellsize, cells.dim=cells.dim)
@@ -168,15 +168,22 @@ getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 
 
 .grassVersion <- function(ignore.stderr=TRUE) {
-    Gver <- execGRASS(
+    Gver <- try(execGRASS(
         "g.version",
         intern = TRUE, 
-        ignore.stderr = ignore.stderr)
+        ignore.stderr = ignore.stderr), silent=TRUE)
+    if (inherits(Gver, "try-error"))
+        Gver <- "sh: line 1: g.version: command not found"
     return(Gver)
 }
 
 .compatibleGRASSVersion <- function(gv=.grassVersion()) {
     compatible <- ( (gv >= "GRASS 7.0") & (gv < "GRASS 9.0") )
+    if (gv == "sh: line 1: g.version: command not found") {
+        compatible <- as.logical(NA)
+        attr(compatible, "message") <- gv
+        return(compatible)
+    }
     if ( !compatible ){
         attr(compatible, "message") <- paste0(
             "\n### rgrass7 is not compatible with the GRASS GIS version '", gv, "'!",

@@ -49,9 +49,34 @@ remove_GISRC()
 
 \seealso{\code{\link{gmeta}}}
 \examples{
-\dontrun{
-initGRASS("/usr/bin/grass-7.0.0", home=tempdir())
-initGRASS("C:/GRASS", home=tempdir())
+GRASS_INSTALLATION <- Sys.getenv("GRASS_INSTALLATION")
+run <- FALSE
+if (nzchar(GRASS_INSTALLATION)) run <- file.info(GRASS_INSTALLATION)$isdir
+run <- run && require(terra, quietly=TRUE)
+if (run) {
+f <- system.file("ex/elev.tif", package="terra")
+r <- rast(f)
+plot(r, col=grDevices::terrain.colors(50))
+}
+if (run) {
+(loc <- initGRASS(GRASS_INSTALLATION, home=tempdir(), SG=r, override=TRUE))
+}
+if (run) {
+write_RAST(r, "elev", flags="overwrite")
+execGRASS("r.info", map="elev")
+}
+if (run) {
+s <- rast(r)
+values(s) <- values(r)
+write_RAST(s, "elev1", flags="overwrite")
+execGRASS("r.info", map="elev1")
+}
+if (run) {
+execGRASS("r.slope.aspect", flags="overwrite", elevation="elev", slope="slope", aspect="aspect")
+}
+if (run) {
+u1 <- read_RAST(c("elev", "slope", "aspect"), return_format="terra")
+plot(u1[["elev"]], col=grDevices::terrain.colors(50))
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -47,7 +47,7 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   else {
     gv <- .grassVersion()
     comp <- .compatibleGRASSVersion(gv)
-    if ( !comp ){
+    if (!is.na(comp) && !comp ){
         stop( attr(comp, "message") )
     }
     assign("GV", gv, envir=.GRASS_CACHE)

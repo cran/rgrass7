@@ -5,6 +5,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         remove.duplicates=TRUE, ignore.stderr = NULL,
         with_prj=TRUE,  with_c=FALSE, mapset=NULL, pointDropZ=FALSE,
         driver=NULL) {
+        .Deprecated(new="read_VECT", package="rgrass7", old="readVECT",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 8.\n'readVECT' is deprecated. Use 'read_VECT' instead.")
         if (is.null(.get_R_interface())) 
        stop("use either use_sp() or use_sf() at session start to choose\n sp or sf/stars classes")
         R_in_sp <- isTRUE(.get_R_interface() == "sp")
@@ -390,6 +392,8 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
     v.in.ogr_flags=NULL, ignore.stderr = NULL,
     driver=NULL, min_area=0.0001, snap=-1) {
 
+    .Deprecated(new="write_VECT", package="rgrass7", old="writeVECT",
+       msg="Package rgrass7 transitioning to package rgrass for GRASS 8.\n'writeVECT is deprecated. Use 'write_VECT' instead.")
     R_in_sp <- isTRUE(.get_R_interface() == "sp")
 
     if (is.null(ignore.stderr))
@@ -438,9 +442,9 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
             if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
             type <- NULL
             if (R_in_sp) {
-              if (class(SDF) == "SpatialPointsDataFrame") type <- "point"
-              if (class(SDF) == "SpatialLinesDataFrame") type <- "line"
-              if (class(SDF) == "SpatialPolygonsDataFrame") type <- "boundary"
+              if (inherits(SDF, "SpatialPointsDataFrame")) type <- "point"
+              if (inherits(SDF, "SpatialLinesDataFrame")) type <- "line"
+              if (inherits(SDF, "SpatialPolygonsDataFrame")) type <- "boundary"
             } else {
               type0 <- sub("sfc_", "", class(sf::st_geometry(SDF))[1])
               if (type0 == "POINT") type <- "point"

@@ -1,8 +1,10 @@
-% Copyright (C) 2005-2010 Roger S. Bivand
+% Copyright (C) 2005-2022 Roger S. Bivand
 %
 \name{readVECT}
 \alias{readVECT}
 \alias{writeVECT}
+\alias{read_VECT}
+\alias{write_VECT}
 \alias{vInfo}
 \alias{vColumns}
 \alias{vDataCount}
@@ -10,16 +12,19 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Read and write GRASS vector object files}
 \description{
-  \code{readVECT} moves one GRASS vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
+  \code{readVECT} moves one GRASS vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{read_VECT} moves one GRASS vector object file with attribute data through a temporary GeoPackage file to a \pkg{terra} \code{"SpatVector"} object; \code{write_VECT} moves a \pkg{terra} \code{"SpatVector"} object through a temporary GeoPackage file to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
 }
 \usage{
 readVECT(vname, layer, type=NULL, plugin=NULL,
  remove.duplicates = TRUE, ignore.stderr=NULL,
  with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver=NULL)
+read_VECT(vname, layer, type=NULL, flags="overwrite",
+    ignore.stderr = NULL)
 writeVECT(SDF, vname,  v.in.ogr_flags=NULL,
  ignore.stderr = NULL, driver=NULL,
  min_area=0.0001, snap=-1)
+write_VECT(x, vname, flags="overwrite", ignore.stderr = NULL)
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
 vDataCount(vname, layer, ignore.stderr = NULL)
@@ -43,7 +48,8 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
   \item{min_area}{default 0.0001); Minimum size of area to be imported (square meters) Smaller areas and islands are ignored. Should be greater than snap^2}
   \item{snap}{default -1); Snapping threshold for boundaries (map units). '-1' for no snap}
   \item{SDF}{A Spatial*DataFrame to be moved to GRASS as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects, or an equivalent \code{"sf"} object}
-  \item{v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
+  \item{x}{A \code{"SpatVector"} object moved to GRASS}
+  \item{flags, v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
   \item{ID}{A valid DB column name for unique identifiers (optional)}
   \item{remove}{default TRUE, remove copied vectors created in \code{vect2neigh}}
   \item{vname2}{If on a previous run, remove was FALSE, the name of the temporary vector may be given to circumvent its generation}
@@ -131,6 +137,9 @@ if (run) {
   cen_neig <- vect2neigh("census")
   str(cen_neig)
 }
+if (run) {
+  execGRASS("g.remove", flags="f", name=c("newsch", "newsch1"), type="vector")
+}
 use_sf()
 if (run) {
   print(vInfo("schools"))
@@ -148,6 +157,21 @@ if (run) {
 if (run) {
   nschs <- readVECT("newsch")
   print(summary(nschs))
+}
+if (run) {
+  execGRASS("g.remove", flags="f", name="newsch", type="vector")
+}
+run <- run && require("terra", quietly=TRUE)
+if (run) {
+  v1 <- read_VECT("census")
+  v1
+}
+if (run) {
+  write_VECT(v1, "census_sV")
+  execGRASS("v.info", map="census_sV")
+}
+if (run) {
+  execGRASS("g.remove", flags="f", name="census_sV", type="vector")
 }
 Sys.setenv("GRASS_VERBOSE"=GV)
 set.ignore.stderrOption(ois)
