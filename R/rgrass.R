@@ -39,7 +39,10 @@ gmeta <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 	if (length(lres$depths) == 0) 
 		lres$depths <- abs(as.integer((lres$t-lres$b)/lres$tbres))
 	else lres$depths <- as.integer(lres$depths)
-	lres$proj4 <- getLocationProj(g.proj_WKT=g.proj_WKT)
+        lres$proj4 <- ""
+        prj <- try(getLocationProj(g.proj_WKT=g.proj_WKT,
+            ignore.stderr=ignore.stderr), silent=TRUE)
+	if (!inherits(prj, "try-error")) lres$proj4 <- prj
         gisenv <- execGRASS("g.gisenv", flags="n", intern=TRUE,
             ignore.stderr=ignore.stderr)
 	gisenv <- gsub("[';]", "", gisenv)

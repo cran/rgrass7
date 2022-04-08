@@ -24,7 +24,8 @@ unlink_.gislock <- function() {
 }
 
 initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
-    mapset, override=FALSE, use_g.dirseps.exe=TRUE, pid, remove_GISRC=FALSE) {
+    mapset, override=FALSE, use_g.dirseps.exe=TRUE, pid, remove_GISRC=FALSE,
+    ignore.stderr=get.ignore.stderrOption()) {
     if (nchar(Sys.getenv("GISRC")) > 0 && !override)
       stop("A GRASS location is already in use; to override, set override=TRUE")
 
@@ -260,7 +261,7 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
                 bb <- sp::bbox(SG)
                 gt <- sp::gridparameters(SG)
                 wkt_SG <- sp::wkt(SG)
-                lonlatSG <- sp::is.projected(SG)
+                lonlatSG <- !sp::is.projected(SG)
             } else if (inherits(SG, "SpatRaster")) {
                 if (!requireNamespace("terra", quietly=TRUE))
                     stop("The terra package is required for the SG argument")
@@ -316,20 +317,28 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     if (!file.exists(tfile)) file.copy(pfile, tfile, overwrite=TRUE)
     tfile <- paste(loc_path, mapset, "WIND", sep="/")
     if (!file.exists(tfile)) file.copy(pfile, tfile, overwrite=TRUE)
-    execGRASS("g.region", save="input", flags="overwrite")
+    execGRASS("g.region", save="input", flags="overwrite",
+        ignore.stderr=ignore.stderr)
     if (mSG) {
         if (nzchar(wkt_SG)) {
             tf <- tempfile()
             writeLines(wkt_SG, con=tf)
-	    execGRASS("g.mapset", mapset="PERMANENT", flags="quiet")
-            tull <- execGRASS("g.proj", flags="c", wkt=tf, ignore.stderr=TRUE,
-                intern=TRUE)
-            execGRASS("g.region", flags="s", region=paste0("input@", mapset))
-            execGRASS("g.region", flags="d", ignore.stderr=TRUE)
-            execGRASS("g.mapset", mapset=mapset, flags="quiet")
+            MS <- execGRASS("g.mapset", flags="p", intern=TRUE,
+                ignore.stderr=ignore.stderr)
+	    if (MS != "PERMANENT") 
+                execGRASS("g.mapset", mapset="PERMANENT", flags="quiet",
+                    ignore.stderr=ignore.stderr)
+            tull <- execGRASS("g.proj", flags="c", wkt=tf,
+                ignore.stderr=ignore.stderr, intern=TRUE)
+            execGRASS("g.region", flags="s", region=paste0("input@", mapset),
+                ignore.stderr=ignore.stderr)
+            execGRASS("g.region", flags="d", ignore.stderr=ignore.stderr)
+	    if (MS != "PERMANENT") 
+                execGRASS("g.mapset", mapset=mapset, flags="quiet",
+                    ignore.stderr=ignore.stderr)
         }
     }
-    gmeta()
+    gmeta(ignore.stderr=ignore.stderr)
 }
 
 remove_GISRC <- function() {

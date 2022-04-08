@@ -16,7 +16,8 @@ The locking functions are used internally, but are exposed for experienced R/GRA
 }
 \usage{
 initGRASS(gisBase, home, SG, gisDbase, addon_base, location, mapset,
-  override = FALSE, use_g.dirseps.exe = TRUE, pid, remove_GISRC=FALSE)
+  override = FALSE, use_g.dirseps.exe = TRUE, pid, remove_GISRC=FALSE,
+  ignore.stderr=get.ignore.stderrOption())
 get.GIS_LOCK()
 set.GIS_LOCK(pid)
 unset.GIS_LOCK()
@@ -36,6 +37,7 @@ remove_GISRC()
   \item{use_g.dirseps.exe}{default TRUE; when TRUE appears to work for WinGRASS Native binaries, when FALSE for QGIS GRASS binaries; ignored on other platforms.}
   \item{pid}{default \code{as.integer(round(runif(1, 1, 1000)))}, integer used to identify GIS_LOCK; the value here is arbitrary, but probably should be set correctly}
   \item{remove_GISRC}{default FALSE; if TRUE, attempt to unlink the temporary file named in the \dQuote{GISRC} environment variable when the R session terminates or when this package is unloaded}
+  \item{ignore.stderr}{default taking the value set by \code{set.ignore.stderrOption}; can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
 }
 \details{
   The function establishes an out-of-GRASS working environment providing GRASS commands with the environment variable support required, and may also provide a temporary location for use until the end of the running R session if the \code{home} argument is set to \code{tempdir()}, and the \code{gisDbase} argument is not given. Running \code{gmeta6} shows where the location is, should it be desired to archive it before leaving R.
