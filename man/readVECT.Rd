@@ -66,7 +66,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
 Please note that the OGR drivers used may not handle missing data gracefully. From rgdal release 0.5-27, missing values are taken as unset OGR field values. If the OGR driver encodes them in this way, NAs will be moved across the interface correctly from R to GRASS, and from GRASS to R using the OGR GRASS vector plugin. Work is continuing to correct v.out.ogr so that it emits unset fields, which affects users with no OGR GRASS plugin for the present. Thanks to Dylan Beaudette for helping with missing data handling.
 
 }
-\author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
+\author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no}}
 
 \examples{
 use_sp()

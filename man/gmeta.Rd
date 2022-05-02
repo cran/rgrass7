@@ -1,4 +1,4 @@
-% Copyright (C) 2005 Roger S. Bivand
+% Copyright (C) 2005-22 Roger S. Bivand
 %
 \name{gmeta}
 \alias{gmeta}
@@ -69,7 +69,7 @@ set.suppressEchoCmdInFuncOption(value)
   Returns list of g.gisenv, g.region -g3, and g.proj values
 }
 
-\author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
+\author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no}}
 
 \examples{
 use_sp()

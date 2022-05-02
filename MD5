@@ -1,6 +1,6 @@
-048e37f0eecc3c7ce0ecab2795993a17 *DESCRIPTION
+355fd25f1c5a50eb300ab4508b1b9282 *DESCRIPTION
 50ccca2d8137dfd5802c96f74bd6930e *NAMESPACE
-b18d6f7632b83b37a4fd916d5782c839 *NEWS.md
+6a9672d5af1b8f65c6742391247a745f *NEWS.md
 a4d946683e52945ede5321c12059fc2d *R/AAA.R
 05bfaba677ecb59ceddc342caec3efa0 *R/bin_link.R
 b4b8ab3f129739816ca81926e2daac18 *R/initGRASS.R
@@ -12,8 +12,8 @@ e3913c4a8e5e471faf786e3f684492b9 *R/vect_link_ng.R
 c7397c3d6bd47aa39e9021b3a3631eff *R/xml1.R
 1fb2f48b1708a40aed5724fddd1fc519 *inst/pre_git_ChangeLog
 5b0d28d7a60359711323cddc14e29f8b *man/execGRASS.Rd
-3b77b44915529edf59dbc5c059a610d3 *man/gmeta.Rd
+d63f290b2784f0d012edb55e6b38ab73 *man/gmeta.Rd
 c0f3d50a263bb42bd25d2babcc32cc05 *man/initGRASS.Rd
 f2e100fa380133c3f75e5dba31dbc33c *man/readRAST.Rd
-14d3b20c3c2ccccbb7b9073baf08ae71 *man/readVECT.Rd
+5426dd525d40d735f52c72a6c39f02c4 *man/readVECT.Rd
 584a97f99e88e4b25bf5543359a7d767 *man/rgrass.Rd

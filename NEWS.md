@@ -1,4 +1,8 @@
-# version 0.2-9 (development)
+# version 0.2-10 (development)
+
+* resolve tidy HTML markup failure
+
+# version 0.2-9 (2022-04-08)
 
 * resolve issue #53 - logic problems in `initGRASS()` and `gmeta()` when no CRS given and when `SG=` is an **sp** object
 
