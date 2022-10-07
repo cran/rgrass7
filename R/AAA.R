@@ -57,7 +57,7 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
 
   }
 
-  Smess <- paste('GRASS GIS interface loaded ',
+  Smess <- paste('Package deprecated; switch to package rgrass. This package will\n', 'be retired before rgdal is retired during 2023\n', 'GRASS GIS interface loaded ',
     'with GRASS version: ', gv, '\n',
     ifelse(nchar(loc) == 0, '', paste('and location: ', loc, '\n', sep="")),
       sep="")

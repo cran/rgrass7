@@ -5,8 +5,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         remove.duplicates=TRUE, ignore.stderr = NULL,
         with_prj=TRUE,  with_c=FALSE, mapset=NULL, pointDropZ=FALSE,
         driver=NULL) {
-        .Deprecated(new="read_VECT", package="rgrass7", old="readVECT",
-            msg="Package rgrass7 transitioning to package rgrass for GRASS 8.\n'readVECT' is deprecated. Use 'read_VECT' instead.")
+        .Deprecated(new="read_VECT", package="rgrass", old="readVECT",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.\n'readVECT' is deprecated. Use 'read_VECT' instead.")
         if (is.null(.get_R_interface())) 
        stop("use either use_sp() or use_sf() at session start to choose\n sp or sf/stars classes")
         R_in_sp <- isTRUE(.get_R_interface() == "sp")
@@ -392,8 +392,8 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
     v.in.ogr_flags=NULL, ignore.stderr = NULL,
     driver=NULL, min_area=0.0001, snap=-1) {
 
-    .Deprecated(new="write_VECT", package="rgrass7", old="writeVECT",
-       msg="Package rgrass7 transitioning to package rgrass for GRASS 8.\n'writeVECT is deprecated. Use 'write_VECT' instead.")
+    .Deprecated(new="write_VECT", package="rgrass", old="writeVECT",
+       msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.\n'writeVECT is deprecated. Use 'write_VECT' instead.")
     R_in_sp <- isTRUE(.get_R_interface() == "sp")
 
     if (is.null(ignore.stderr))
@@ -559,6 +559,8 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
 }
 
 vInfo <- function(vname, layer, ignore.stderr = NULL) {
+        .Deprecated(new="vInfo", package="rgrass", old="vInfo",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -586,6 +588,8 @@ vInfo <- function(vname, layer, ignore.stderr = NULL) {
 }
 
 vColumns <- function(vname, layer, ignore.stderr = NULL) {
+        .Deprecated(new="vColumns", package="rgrass", old="vColumns",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -611,6 +615,8 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
 }
 
 vDataCount <- function(vname, layer, ignore.stderr = NULL) {
+        .Deprecated(new="vDataCount", package="rgrass", old="vDataCount",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -699,7 +705,8 @@ vDataCount <- function(vname, layer, ignore.stderr = NULL) {
 
 vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
     vname2=NULL, units="k") {
-
+        .Deprecated(new="vect2neigh", package="rgrass", old="vect2neigh",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- get.echoCmdOption()
         tull <- set.echoCmdOption(FALSE)

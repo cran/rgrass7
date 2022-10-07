@@ -1,4 +1,8 @@
-# version 0.2-10 (development)
+# version 0.2-11 (development)
+
+* deprecate all functions - use **rgrass**, not this package
+
+# version 0.2-10 (2022-05-02)
 
 * resolve tidy HTML markup failure
 

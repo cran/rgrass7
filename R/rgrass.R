@@ -3,6 +3,8 @@
 #
 
 gmeta <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
+        .Deprecated(new="gmeta", package="rgrass", old="gmeta",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -205,6 +207,8 @@ getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 .get_R_interface <- function() get("R_interface", envir=.GRASS_CACHE)
 
 use_sf <- function() {
+        .Deprecated(old="use_sf",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
   if (requireNamespace("sf", quietly=TRUE) && 
     requireNamespace("stars", quietly=TRUE))
     assign("R_interface", "sf", envir=.GRASS_CACHE)
@@ -212,6 +216,8 @@ use_sf <- function() {
 }
 
 use_sp <- function() {
+        .Deprecated(old="use_sp",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
   if (requireNamespace("sp", quietly=TRUE) && 
      requireNamespace("rgdal", quietly=TRUE))
      assign("R_interface", "sp", envir=.GRASS_CACHE)

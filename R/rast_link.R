@@ -5,7 +5,8 @@
 read_RAST <- function(vname, cat=NULL, NODATA=NULL, 
     ignore.stderr=get.ignore.stderrOption(), return_format="SGDF", 
     close_OK=return_format=="SGDF", flags=NULL) {
-
+        .Deprecated(new="read_RAST", package="rgrass", old="read_RAST",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (!is.null(cat))
         if(length(vname) != length(cat)) 
 	    stop("vname and cat not same length")
@@ -335,7 +336,8 @@ read_cat_colors <- function(vname) {
 
 write_RAST <- function(x, vname, zcol = 1, NODATA=NULL, flags=NULL, 
     ignore.stderr = get.ignore.stderrOption(), overwrite=FALSE, verbose=TRUE) {
-
+        .Deprecated(new="write_RAST", package="rgrass", old="write_RAST",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- set.echoCmdOption(FALSE)
     }

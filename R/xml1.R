@@ -1,5 +1,7 @@
 parseGRASS <- function(cmd, legacyExec=NULL) {
-    cmdCACHE <- get("cmdCACHE", envir=.GRASS_CACHE)
+        .Deprecated(new="parseGRASS", package="rgrass", old="parseGRASS",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+     cmdCACHE <- get("cmdCACHE", envir=.GRASS_CACHE)
     res <- cmdCACHE[[cmd]]
     if (is.null(legacyExec))
         legacyExec <- get.legacyExecOption()
@@ -163,7 +165,9 @@ print.GRASS_interface_desc <- function(x, ...) {
 }
 
 doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyExec=NULL) {
-    defFlags <- get.defaultFlagsOption()
+        .Deprecated(new="doGRASS", package="rgrass", old="doGRASS",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+     defFlags <- get.defaultFlagsOption()
     if (!is.null(defFlags)) flags <- unique(c(flags, defFlags))
     if (all(c("quiet", "verbose") %in% flags)) {
         flags <- flags[flags != "quiet"]
@@ -339,7 +343,9 @@ execGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, intern=NULL,
     ignore.stderr=NULL, Sys_ignore.stdout=FALSE, Sys_wait=TRUE,
     Sys_input=NULL, Sys_show.output.on.console=TRUE, Sys_minimized=FALSE,
     Sys_invisible=TRUE, echoCmd=NULL, redirect=FALSE, legacyExec=NULL) {
-    if (is.null(ignore.stderr))
+        .Deprecated(new="execGRASS", package="rgrass", old="execGRASS",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+     if (is.null(ignore.stderr))
         ignore.stderr <- get.ignore.stderrOption()
     stopifnot(is.logical(ignore.stderr))
     if (is.null(intern))
@@ -428,7 +434,9 @@ stringexecGRASS <- function(string,
                             echoCmd=NULL, 
                             redirect=FALSE, 
                             legacyExec=NULL) {
-  stopifnot(is.character(string) && length(string) == 1)
+        .Deprecated(new="stringexecGRASS", package="rgrass", old="stringexecGRASS",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+   stopifnot(is.character(string) && length(string) == 1)
   # extract quoted parameters
   quoted_params <- regmatches(string, 
                               gregexpr("\\w+=['\"].*?['\"]", string))[[1]]

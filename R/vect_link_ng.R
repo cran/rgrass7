@@ -3,7 +3,9 @@
 #
 read_VECT <- function(vname, layer, type=NULL, flags="overwrite",
     ignore.stderr = NULL) {
-    if (!(requireNamespace("terra", quietly=TRUE))) 
+        .Deprecated(new="read_VECT", package="rgrass", old="read_VECT",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+     if (!(requireNamespace("terra", quietly=TRUE))) 
         stop("terra required for SpatVector output")
     if (is.null(ignore.stderr))
         ignore.stderr <- get.ignore.stderrOption()
@@ -36,7 +38,9 @@ read_VECT <- function(vname, layer, type=NULL, flags="overwrite",
 
 write_VECT <- function(x, vname, flags="overwrite", ignore.stderr = NULL) {
 
-    if (!(requireNamespace("terra", quietly=TRUE))) 
+        .Deprecated(new="write_VECT", package="rgrass", old="write_VECT",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+     if (!(requireNamespace("terra", quietly=TRUE))) 
         stop("terra required for SpatVector input")
     if (is.null(ignore.stderr))
             ignore.stderr <- get.ignore.stderrOption()

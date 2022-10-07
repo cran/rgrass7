@@ -26,6 +26,8 @@ unlink_.gislock <- function() {
 initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     mapset, override=FALSE, use_g.dirseps.exe=TRUE, pid, remove_GISRC=FALSE,
     ignore.stderr=get.ignore.stderrOption()) {
+        .Deprecated(new="initGRASS", package="rgrass", old="initGRASS",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (nchar(Sys.getenv("GISRC")) > 0 && !override)
       stop("A GRASS location is already in use; to override, set override=TRUE")
 
