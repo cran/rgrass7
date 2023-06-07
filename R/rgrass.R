@@ -60,6 +60,8 @@ gmeta <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 }
 
 print.gmeta <- function(x, ...) {
+        .Deprecated(new="print.gmeta", package="rgrass", old="print.gmeta",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     cat("gisdbase   ", x$GISDBASE, "\n")
     cat("location   ", x$LOCATION_NAME, "\n")
     cat("mapset     ", x$MAPSET, "\n")
@@ -79,6 +81,8 @@ print.gmeta <- function(x, ...) {
 }
 
 gmeta2grd <- function(ignore.stderr = FALSE) {
+        .Deprecated(new="gmeta2grd", package="rgrass", old="gmeta2grd",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
 	if (!requireNamespace("sp", quietly=TRUE))
 		stop("sp required to creat a GridTopology object")
 	G <- gmeta(ignore.stderr=ignore.stderr)
@@ -95,6 +99,8 @@ gmeta2grd <- function(ignore.stderr = FALSE) {
 
 getLocationProj <- function(ignore.stderr = FALSE, g.proj_WKT=NULL) {
 # too strict assumption on g.proj Rohan Sadler 20050928
+        .Deprecated(new="getLocationProj", package="rgrass", old="getLocationProj",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- get.echoCmdOption()
          tull <- set.echoCmdOption(FALSE)

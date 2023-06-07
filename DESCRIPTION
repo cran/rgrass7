@@ -1,6 +1,6 @@
 Package: rgrass7
-Version: 0.2-11
-Date: 2022-10-02
+Version: 0.2-12
+Date: 2023-06-06
 Title: Deprecated Interface Between GRASS Geographical Information
         System and R
 Authors@R: c(
@@ -9,21 +9,20 @@ Authors@R: c(
 	person("Markus", "Neteler", role = "ctb", email="neteler@osgeo.org", comment=c(ORCID="0000-0003-1916-1966")),
 	person("Sebastian", "Jeworutzki", role = "ctb", email="Sebastian.Jeworutzki@rub.de", comment=c(ORCID="0000-0002-2671-5253")),
 	person("Floris", "Vanderhaeghe", role = "ctb", email="floris.vanderhaeghe@inbo.be", comment=c(ORCID="0000-0002-6378-6229")))
-Description: Deprecated interpreted interface between 'GRASS' geographical 
-    information system and R. Transition to new package 'rgrass'.
+Description: This package will be archived in October 2023 together with 'rgdal'. Deprecated interpreted interface between 'GRASS' geographical 
+    information system and R. Transition to new package 'rgrass' <https://grass.osgeo.org/news/2023_06_05_retirement_of_rgrass7/>.
 Depends: R (>= 3.3.0), XML
 Imports: stats, utils, methods
 Suggests: rgdal (>= 1.0-6), RSQLite, sp (>= 0.9), sf (>= 0.7.6), stars,
         terra
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
-URL: https://grass.osgeo.org/, https://github.com/rsbivand/rgrass,
-        https://rsbivand.github.io/rgrass/
+URL: https://grass.osgeo.org/, https://github.com/rsbivand/rgrass
 BugReports: https://github.com/rsbivand/rgrass/issues/
 Collate: AAA.R options.R rgrass.R bin_link.R rast_link.R vect_link.R
         vect_link_ng.R initGRASS.R xml1.R
 NeedsCompilation: no
-Packaged: 2022-10-07 15:11:27 UTC; rsb
+Packaged: 2023-06-06 17:06:55 UTC; rsb
 Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>),
   Rainer Krug [ctb] (<https://orcid.org/0000-0002-7490-0066>),
   Markus Neteler [ctb] (<https://orcid.org/0000-0003-1916-1966>),
@@ -31,4 +30,4 @@ Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>),
   Floris Vanderhaeghe [ctb] (<https://orcid.org/0000-0002-6378-6229>)
 Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 Repository: CRAN
-Date/Publication: 2022-10-07 16:10:07 UTC
+Date/Publication: 2023-06-07 08:30:02 UTC

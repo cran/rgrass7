@@ -38,9 +38,11 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   assign("defaultFlags", NULL, envir=.GRASS_CACHE)
   assign("suppressEchoCmdInFunc", TRUE, envir=.GRASS_CACHE)
   assign("R_interface", NULL, envir=.GRASS_CACHE)
+  load_stuff()
 }
 
-.onAttach <- function(lib, pkg) {
+load_stuff <- function() {
+  Smess <- paste("rgrass7 will be retired (archived on CRAN) with rgdal in October 2023.\nPlease migrate to the rgrass package as soon as possible!\nSee https://grass.osgeo.org/news/2023_06_05_retirement_of_rgrass7/\n")
   gisrc <- Sys.getenv("GISRC")
   loc <- Sys.getenv("LOCATION_NAME")
   if (nchar(gisrc) == 0) gv <- "(GRASS not running)"
@@ -53,15 +55,17 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
     assign("GV", gv, envir=.GRASS_CACHE)
     if(nchar(loc) == 0) {
       loc <- read.dcf(gisrc)[1,"LOCATION_NAME"]
+    }
   }
 
-  }
-
-  Smess <- paste('Package deprecated; switch to package rgrass. This package will\n', 'be retired before rgdal is retired during 2023\n', 'GRASS GIS interface loaded ',
+  Smess <- paste(Smess, 'GRASS GIS interface loaded ',
     'with GRASS version: ', gv, '\n',
     ifelse(nchar(loc) == 0, '', paste('and location: ', loc, '\n', sep="")),
       sep="")
   packageStartupMessage(Smess, appendLF = FALSE)
+}
+
+.onAttach <- function(lib, pkg) {
 }
 
 .onUnload <- function(lib, pkg) {

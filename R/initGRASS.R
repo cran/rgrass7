@@ -3,10 +3,14 @@
 #
 # GIS_LOCK 110814 RSB, suggested by Brian Oney
 get.GIS_LOCK <- function() {
+        .Deprecated(new="get.GIS_LOCK", package="rgrass", old="get.GIS_LOCK",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     Sys.getenv("GIS_LOCK")
 }
 
 set.GIS_LOCK <- function(pid) {
+        .Deprecated(new="set.GIS_LOCK", package="rgrass", old="set.GIS_LOCK",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (missing(pid)) pid <- round(runif(1, 1, 1000))
     pid <- as.integer(pid)
     stopifnot(!is.na(pid))
@@ -14,10 +18,14 @@ set.GIS_LOCK <- function(pid) {
 }
 
 unset.GIS_LOCK <- function() {
+        .Deprecated(new="unset.GIS_LOCK", package="rgrass", old="unset.GIS_LOCK",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     Sys.unsetenv("GIS_LOCK")
 }
 
 unlink_.gislock <- function() {
+        .Deprecated(new="unset.GIS_LOCK", package="rgrass", old="unset.GIS_LOCK",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     gl <- paste(Sys.getenv("GISDBASE"), Sys.getenv("LOCATION_NAME"),
         Sys.getenv("MAPSET"), ".gislock", sep="/")
     if (file.exists(gl)) unlink(gl)
@@ -344,6 +352,8 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
 }
 
 remove_GISRC <- function() {
+        .Deprecated(new="remove_GISRC", package="rgrass", old="remove_GISRC",
+            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     if (get("INIT_USED", envir=.GRASS_CACHE) && 
         get("remove_GISRC", envir=.GRASS_CACHE)) {
         gisrc <- Sys.getenv("GISRC")

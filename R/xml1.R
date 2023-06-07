@@ -1,6 +1,6 @@
 parseGRASS <- function(cmd, legacyExec=NULL) {
-        .Deprecated(new="parseGRASS", package="rgrass", old="parseGRASS",
-            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+#        .Deprecated(new="parseGRASS", package="rgrass", old="parseGRASS",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
      cmdCACHE <- get("cmdCACHE", envir=.GRASS_CACHE)
     res <- cmdCACHE[[cmd]]
     if (is.null(legacyExec))
@@ -133,15 +133,21 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
 } 
 
 setXMLencoding <- function(enc) {
+#        .Deprecated(new="setXMLencoding", package="rgrass", old="setXMLencoding",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
   if (!is.character(enc) || length(enc) > 1)
     stop("enc must be a character string")
   invisible(assign("override_encoding", enc, envir=.GRASS_CACHE))
 }
 
 getXMLencoding <- function() {
+#        .Deprecated(new="getXMLencoding", package="rgrass", old="getXMLencoding",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
  get("override_encoding", envir=.GRASS_CACHE)
 }
 print.GRASS_interface_desc <- function(x, ...) {
+#        .Deprecated(new="print.GRASS_interface_desc", package="rgrass", old="print.GRASS_interface_desc",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
     cat("Command:", x$cmd, "\n")
     if (nchar(x$ext) > 0) cat("Extension:", x$ext, "\n")
     if (nchar(x$prep) > 0) cat("Shell prefix:", x$prep, "\n")
@@ -165,8 +171,8 @@ print.GRASS_interface_desc <- function(x, ...) {
 }
 
 doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyExec=NULL) {
-        .Deprecated(new="doGRASS", package="rgrass", old="doGRASS",
-            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+#        .Deprecated(new="doGRASS", package="rgrass", old="doGRASS",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
      defFlags <- get.defaultFlagsOption()
     if (!is.null(defFlags)) flags <- unique(c(flags, defFlags))
     if (all(c("quiet", "verbose") %in% flags)) {
@@ -343,8 +349,8 @@ execGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, intern=NULL,
     ignore.stderr=NULL, Sys_ignore.stdout=FALSE, Sys_wait=TRUE,
     Sys_input=NULL, Sys_show.output.on.console=TRUE, Sys_minimized=FALSE,
     Sys_invisible=TRUE, echoCmd=NULL, redirect=FALSE, legacyExec=NULL) {
-        .Deprecated(new="execGRASS", package="rgrass", old="execGRASS",
-            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+#        .Deprecated(new="execGRASS", package="rgrass", old="execGRASS",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
      if (is.null(ignore.stderr))
         ignore.stderr <- get.ignore.stderrOption()
     stopifnot(is.logical(ignore.stderr))
@@ -434,8 +440,8 @@ stringexecGRASS <- function(string,
                             echoCmd=NULL, 
                             redirect=FALSE, 
                             legacyExec=NULL) {
-        .Deprecated(new="stringexecGRASS", package="rgrass", old="stringexecGRASS",
-            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
+#        .Deprecated(new="stringexecGRASS", package="rgrass", old="stringexecGRASS",
+#            msg="Package rgrass7 transitioning to package rgrass for GRASS 7+.")
    stopifnot(is.character(string) && length(string) == 1)
   # extract quoted parameters
   quoted_params <- regmatches(string, 
