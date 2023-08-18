@@ -1,4 +1,4 @@
-a8cc8e3262f5805196941504c9f07e56 *DESCRIPTION
+188175c7eebe992b5ebddc1c4b1a6108 *DESCRIPTION
 50ccca2d8137dfd5802c96f74bd6930e *NAMESPACE
 29259ba790c663b36b003c63748e8ed4 *NEWS.md
 b1a5c3c5366334a1562eaebe68f4ce35 *R/AAA.R
@@ -11,4 +11,4 @@ d6db6a2f945f2f5dcf163c6fe5ab3d4e *R/rast_link.R
 645d1b965a47610e432a1fe4a3b38138 *R/vect_link_ng.R
 1e13f594709698a9d779c9ce915ecf01 *R/xml1.R
 1fb2f48b1708a40aed5724fddd1fc519 *inst/pre_git_ChangeLog
-8390c12c13f9bb2ca8a558b38cb284ca *man/rgrass-deprecated.Rd
+72e78d468839deca801e8327809a4cc5 *man/rgrass-deprecated.Rd

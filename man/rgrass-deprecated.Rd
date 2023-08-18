@@ -49,7 +49,7 @@
 \alias{vColumns}
 \alias{vDataCount}
 \alias{vect2neigh}
-\docType{package}
+
 \title{
 Interface between GRASS geographical information system and R
 }
